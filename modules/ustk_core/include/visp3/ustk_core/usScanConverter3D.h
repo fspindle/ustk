@@ -25,63 +25,57 @@
  *
  *
  * Authors:
- * Pierre Chatelain
+ * Marc Pouliquen
  *
  *****************************************************************************/
 
 /**
- * @file usScanConverter2D.h
- * @brief 2D scan-converter
- * @author Pierre Chatelain
+ * @file usScanConverter3D.h
+ * @brief 3D scan-converter
  */
 
-#ifndef US_SCAN_CONVERTER_2D_H
-#define US_SCAN_CONVERTER_2D_H
+#ifndef US_SCAN_CONVERTER_3D_H
+#define US_SCAN_CONVERTER_3D_H
 
-#include <visp3/ustk_core/usImagePostScan2D.h>
-#include <visp3/ustk_core/usImagePreScan2D.h>
+#include <visp3/core/vpMatrix.h>
+#include <visp3/core/vpImage.h>
+#include <visp3/ustk_core/usImagePostScan3D.h>
+#include <visp3/ustk_core/usImagePreScan3D.h>
 
 /**
- * @class usScanConverter2D
- * @brief 2D scan-converter
+ * @class usScanConverter3D
+ * @brief 3D scan-converter
  * @ingroup module_ustk_core
  *
- * This class allows to convert 2D pre-scan ultrasound images to post-scan.
+ * This class allows to convert 3D pre-scan ultrasound images to post-scan.
  * The converter should be initialized through init() and then applied through run().
  */
-class VISP_EXPORT usScanConverter2D
+class VISP_EXPORT usScanConverter3D
 {
  public:
 
-  usScanConverter2D();
+  usScanConverter3D();
 
-  ~usScanConverter2D();
+  ~usScanConverter3D();
 
-  void init(const usImagePostScan2D<unsigned char> &inputSettings, const int BModeSampleNumber,
-            const int scanLineNumber);
+  void init(const usImagePreScan3D<unsigned char> &inputSettings, const double xResolution,
+            const double yResolution,const double zResolution);
 
-  void init(const usTransducerSettings &inputSettings, const int BModeSampleNumber,
-            const int scanLineNumber, const double xResolution, const double yResolution);
+  void run(const usImagePreScan3D<unsigned char> &preScanImage, usImagePostScan3D<unsigned char> &postScanImage);
 
-  void run(const usImagePreScan2D<unsigned char> &preScanImage, usImagePostScan2D<unsigned char> &postScanImage);
-
-  vpImage<unsigned char> m_imageMap;
+  vpImage<unsigned char> m_Image;
  private:
-  double interpolateLinear(const vpImage<unsigned char>& I, double x, double y);
+  //double interpolateLinear(const vpImage<unsigned char>& I, double x, double y, double z);
 
-  vpMatrix m_rMap;
-  vpMatrix m_tMap;
+  vpMatrix m_xMap;
+  usImage3D<double> m_yMap;
+  usImage3D<double> m_zMap;
+  int m_dimX, m_dimY, m_dimZ;
+
 
   double m_xResolution;
   double m_yResolution;
-  int m_scanLineNumber;
-  int m_BModeSampleNumber;
-
-  usTransducerSettings m_settings;
-
-  unsigned int m_height;
-  unsigned int m_width;
-
+  double m_zResolution;
 };
 
-#endif // US_SCAN_CONVERTER_2D_H
+#endif // US_SCAN_CONVERTER_3D_H

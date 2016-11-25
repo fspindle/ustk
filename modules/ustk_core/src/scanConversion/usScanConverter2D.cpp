@@ -75,6 +75,9 @@ void usScanConverter2D::init(const usImagePostScan2D<unsigned char> &inputSettin
   m_rMap.resize(m_height, m_width);
   m_tMap.resize(m_height, m_width);
 
+  std::cout<< "height " << m_height << std::endl;
+  std::cout<< "width " << m_width << std::endl;
+  m_imageMap.resize(m_height, m_width);
   double x, y;
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
@@ -82,6 +85,8 @@ void usScanConverter2D::init(const usImagePostScan2D<unsigned char> &inputSettin
       y = y_min + j * m_xResolution;
       m_rMap[i][j] = (sqrt(x * x + y * y) - inputSettings.getTransducerRadius()) / APitch;
       m_tMap[i][j] = atan2(y, x) * inputSettings.getTransducerRadius() / LPitch + (scanLineNumber-1) / 2.0;
+      //std::cout << "map = " << m_tMap[i][j] << std::endl;
+      m_imageMap[i][j] = (unsigned char) m_tMap[i][j];
     }
   }
 }
@@ -121,7 +126,10 @@ void usScanConverter2D::init(const usTransducerSettings &inputSettings, const in
 
   m_rMap.resize(m_height, m_width);
   m_tMap.resize(m_height, m_width);
+  m_imageMap.resize(m_height, m_width);
   
+  std::cout<< "height " << m_height << std::endl;
+  std::cout<< "width " << m_width << std::endl;
   double x, y;
   for (unsigned int i = 0; i < m_height; ++i) {
     for (unsigned int j = 0; j < m_width; ++j) {
@@ -129,8 +137,14 @@ void usScanConverter2D::init(const usTransducerSettings &inputSettings, const in
       y = y_min + j * m_xResolution;
       m_rMap[i][j] = (sqrt(x * x + y * y) - inputSettings.getTransducerRadius()) / APitch;
       m_tMap[i][j] = atan2(y, x) * inputSettings.getTransducerRadius() / LPitch + (scanLineNumber-1) / 2.0;
+      //std::cout << "map = " << m_rMap[i][j] << std::endl;
+      m_imageMap[i][j] = (unsigned char) std::abs(m_tMap[i][j]);
     }
   }
+  std::cout << "rmap max : " << m_rMap.getMaxValue() << std::endl;
+  std::cout << "rmap min : " << m_rMap.getMinValue() << std::endl;
+  std::cout << "m_tMap max : " << m_tMap.getMaxValue() << std::endl;
+  std::cout << "m_tMap min : " << m_tMap.getMinValue() << std::endl;
 }
 
 /**

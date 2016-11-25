@@ -103,7 +103,7 @@ void usPixelMeterConversion::convert(const usImagePostScan2D<unsigned char> &ima
  *  -The scan line number : number of scan lines used when you acqired the image.
  *  -The scan line pitch : angle (radians) between two successive scan lines in acquisition.
  *
- *  Settings needed in case of convewx transducer and tilting motor :
+ *  Settings needed in case of convex transducer and tilting motor :
  */
 void usPixelMeterConversion::convert(const usImagePostScan3D<unsigned char> &image,
                                      const double &u, const double &v, const double &w,

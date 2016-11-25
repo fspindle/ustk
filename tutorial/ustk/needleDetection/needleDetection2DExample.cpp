@@ -250,7 +250,7 @@ int main(int argc, const char *argv[])
   // Initialization of the needle detector
   usNeedleTrackerSIR2D needleDetector;
 
-  unsigned int nControlPoints = 2;
+  unsigned int nControlPoints = 3;
   unsigned int nParticles = 200;
 
   needleDetector.setSigma(1.0);
