@@ -47,15 +47,19 @@
 #include <visp3/core/vpList.h>
 
 
+//USTK
+#include <visp3/ustk_core/usImage3D.h>
+
+
 // VTK
-#if defined USNEEDLEDETECTION_HAVE_VTK
-#include <vtkDataSet.h>
-#include <vtkDataArray.h>
-#include <vtkShortArray.h>
-#include <vtkPointData.h>
-#include <vtkImageData.h>
-#include <vtkUnsignedIntArray.h>
-#endif
+//#if defined USNEEDLEDETECTION_HAVE_VTK
+#include <vtk/vtkDataSet.h>
+#include <vtk/vtkDataArray.h>
+#include <vtk/vtkShortArray.h>
+#include <vtk/vtkPointData.h>
+#include <vtk/vtkImageData.h>
+#include <vtk/vtkUnsignedIntArray.h>
+//#endif
 
 /**
  * @namespace usNeedleDetectionTools
@@ -135,14 +139,14 @@ double dist3(double *x, double *y);
 bool findEntry(const vpMatrix &model, double *entry, unsigned int nPoints,
                const vpColVector &origin, const vpColVector &entryPlane, int VOI[6]);
 
-#if defined USNEEDLEDETECTION_HAVE_VTK
+//#if defined USNEEDLEDETECTION_HAVE_VTK
 int findTip(vtkDataArray *data, unsigned int dataSize, double gap);
 bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap);
 bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
 unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU);
 unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU, int prediction);
 bool findTipUsingMeanValues(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
-#endif
+//#endif
 
 /**
    * Compute the geometric median of a set of d-dimensional points.
@@ -152,7 +156,7 @@ bool findTipUsingMeanValues(vtkImageData *image, const vpMatrix &model, int *VOI
    */
 vpColVector geometricMedian(const vpMatrix points, unsigned int npts,
                             unsigned int d);
-#if defined USNEEDLEDETECTION_HAVE_VTK
+//#if defined USNEEDLEDETECTION_HAVE_VTK
 /**
    * Get the coordinates of the points of highest intensity.
    *
@@ -163,9 +167,9 @@ vpColVector geometricMedian(const vpMatrix points, unsigned int npts,
    * @return The threshold.
    */
 void getThresholdedCoordinates(vtkImageData *image, vpMatrix &points, double threshold);
-#endif
+//#endif
 
-#if 0
+
 /**
    * Get the coordinates of the points of highest intensity.
    *
@@ -175,11 +179,11 @@ void getThresholdedCoordinates(vtkImageData *image, vpMatrix &points, double thr
    *
    * @return The threshold.
    */
-double getThresholdedCoordinates(const usVolume<unsigned int> &V,
+double VISP_EXPORT getThresholdedCoordinates( usImage3D<unsigned int> &V,
                                  vpMatrix &points,
                                  unsigned int nDesired);
-#endif
-#if defined USNEEDLEDETECTION_HAVE_VTK
+
+//#if defined USNEEDLEDETECTION_HAVE_VTK
 /**
    * Get the coordinates of the points of highest intensity.
    *
@@ -192,7 +196,7 @@ double getThresholdedCoordinates(const usVolume<unsigned int> &V,
 double getThresholdedCoordinates(vtkImageData *image,
                                  vpMatrix &points,
                                  unsigned int nDesired);
-#endif
+//#endif
 #if defined USNEEDLEDETECTION_HAVE_VTK
 vpList<double*> getThresholdedIds(vtkImageData *image, double threshold);
 #endif
