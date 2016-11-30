@@ -46,6 +46,20 @@
 #include <visp3/ustk_core/usImagePostScan2D.h>
 #include <visp3/ustk_core/usImagePostScan3D.h>
 
+// some standard vtk headers
+#include <vtk/vtkSmartPointer.h>
+#include <vtk/vtkRenderWindow.h>
+#include <vtk/vtkRenderWindowInteractor.h>
+#include <vtk/vtkRenderer.h>
+
+// headers needed for this example
+#include <vtk/vtkImageData.h>
+#include <vtk/vtkImageMapper3D.h>
+#include <vtk/vtkImageCast.h>
+#include <vtk/vtkMetaImageWriter.h>
+#include <vtk/vtkMetaImageReader.h>
+#include <vtk/vtkImageActor.h>
+#include <vtk/vtkAutoInit.h>
 
 /**
  * @class usDisplay3D
@@ -55,8 +69,37 @@
 class VISP_EXPORT usDisplay3D
 {
 public:
+
   usDisplay3D();
+
   virtual ~usDisplay3D();
+
+
+  /**
+   * Initialization method.
+   *
+   * @param renderWinInteractor Pointer to the vtk render window interactor.
+   * @param window_width Window width.
+   * @param window_height Window height.
+   * @param image_origin Coordinates of the image origin.
+   * @param image_dims Image dimensions.
+   * @param nSliceIdx_X Index of the rendered slice in the X direction.
+   * @param nSliceIdx_Y Index of the rendered slice in the Y direction.
+   * @param nSliceIdx_Z Index of the rendered slice in the Z direction.
+   * @param nCamRotAngle_X Renderer camera angle.
+   * @param nCamRotAngle_Y Renderer camera angle.
+   * @param nCamRotAngle_Z Renderer camera angle.
+   * @param nCamFarCls_t Renderer camera position.
+   */
+  void Init(vtkRenderWindowInteractor *renderWinInteractor, int window_width,  int window_height,
+            int image_origin[3], int image_dims[3], int nSliceIdx_X, int nSliceIdx_Y, int nSliceIdx_Z,
+            int nCamRotAngle_X, int nCamRotAngle_Y, int nCamRotAngle_Z, int nCamFarCls_t);
+
+  /**
+   * Renders the volume.
+   */
+  void render(const unsigned char *image_data, int data_size);
+
 };
 
 #endif //US_DISPLAY_3D_H
