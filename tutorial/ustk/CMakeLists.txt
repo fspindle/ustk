@@ -3,6 +3,7 @@ project(visp-tutorial-ustk)
 cmake_minimum_required(VERSION 2.6)
 
 find_package(VISP REQUIRED)
+find_package(VTK REQUIRED)
 
 if(MSVC)
   if(NOT VISP_SHARED)
@@ -36,5 +37,10 @@ visp_add_subdirectory(sonosite REQUIRED_DEPS visp_ustk_core visp_ustk_confidence
 visp_add_subdirectory(scanConversion REQUIRED_DEPS visp_ustk_core visp_ustk_io)
 visp_add_subdirectory(ultrasonix REQUIRED_DEPS visp_ustk_core visp_ustk_grabber)
 visp_add_subdirectory(needleDetection REQUIRED_DEPS visp_ustk_core visp_ustk_io visp_ustk_needle_detection)
-visp_add_subdirectory(display REQUIRED_DEPS visp_ustk_core visp_ustk_io visp_ustk_gui)
+if(VTK_LIBRARIES)
+  visp_add_subdirectory(display REQUIRED_DEPS visp_ustk_core visp_ustk_io visp_ustk_gui ${VTK_LIBRARIES})
+else()
+  visp_add_subdirectory(display REQUIRED_DEPS visp_ustk_core visp_ustk_io visp_ustk_gui vtkHybrid vtkWidgets)
+endif()
+
 endif()
