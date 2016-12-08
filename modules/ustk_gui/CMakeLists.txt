@@ -1,20 +1,23 @@
 vp_add_module(ustk_gui visp_core visp_io visp_gui visp_ustk_core visp_ustk_io)
 
-#Find VTK
 if(NOT VTK_FOUND)
   VP_OPTION(USE_VTK       VTK        ""    "Include vtk support"          "" ON)
 endif()
 
-set(opt_incs "")
-set(opt_libs "")
+find_package(VTK REQUIRED)
 
 if(VTK_FOUND AND USE_VTK)
-      list(APPEND opt_incs ${VTK_USE_FILE})
-      list(APPEND opt_libs ${VTK_LIBRARIES})
+  # Add preprocessor definitions needed to use VTK.
+  set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ${VTK_DEFINITIONS})
+
+  # Add include directories needed to use VTK.
+  include_directories(${VTK_INCLUDE_DIRS})
+
+  # Add link directories needed to use VTK.
+  link_directories(${VTK_LIBRARY_DIRS})
 else()
   message(WARNING "VTK not found for ustk gui module")
 endif()
-
 
 #Find Qt
 #if(NOT QT_FOUND)
@@ -28,5 +31,5 @@ endif()
 #endif()
 
 vp_glob_module_sources()
-vp_module_include_directories(${opt_incs})
-vp_create_module(${opt_libs})
+vp_module_include_directories(${VTK_INCLUDE_DIRS})
+vp_create_module(${VTK_LIBRARIES})

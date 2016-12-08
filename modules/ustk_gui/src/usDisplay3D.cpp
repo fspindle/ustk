@@ -55,17 +55,14 @@ void usDisplay3D::Init(vtkRenderWindowInteractor *renderWinInteractor, int windo
 
 void usDisplay3D::render(const unsigned char *image_data, int data_size)
 {
-    std::cout << "0" << std::endl;
    // Read and display file for verification that it was written correctly
    vtkSmartPointer<vtkMetaImageReader> reader = vtkSmartPointer<vtkMetaImageReader>::New();
    reader->SetFileName("/home/mpouliqu/Documents/usData/postscan/3D/postscan3d.mhd");
    reader->Update();
 
-    std::cout << "1" << std::endl;
    vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
    actor->GetMapper()->SetInputConnection(reader->GetOutputPort());
 
-    std::cout << "2" << std::endl;
    vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
    vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
    renderWindow->AddRenderer(renderer);
@@ -73,11 +70,9 @@ void usDisplay3D::render(const unsigned char *image_data, int data_size)
    renderWindowInteractor->SetRenderWindow(renderWindow);
 
 
-    std::cout << "3" << std::endl;
    renderer->AddActor(actor);
    renderer->SetBackground(.2, .3, .4);
 
-    std::cout << "4" << std::endl;
    renderWindow->Render();
    renderWindowInteractor->Start();
 
@@ -107,8 +102,8 @@ void usDisplay3D::render(const unsigned char *image_data, int data_size)
   //displayImageZ();
 
   // Render volume
-  m_pvtkRenderWindow->Render();*/
-
+  m_pvtkRenderWindow->Render();
+*/
 }
 /*
 void usDisplay3D::NewVTK(void)
@@ -188,4 +183,5 @@ void usDisplay3D::SetVTK(int window_width,  int window_height)
 
    renderWindow->Render();
    renderWindowInteractor->Start();
-}*/
+}
+*/

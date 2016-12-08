@@ -1,11 +1,11 @@
-#include <vtk/vtkCylinderSource.h>
-#include <vtk/vtkPolyData.h>
-#include <vtk/vtkSmartPointer.h>
-#include <vtk/vtkPolyDataMapper.h>
-#include <vtk/vtkActor.h>
-#include <vtk/vtkRenderWindow.h>
-#include <vtk/vtkRenderer.h>
-#include <vtk/vtkRenderWindowInteractor.h>
+#include <vtkCylinderSource.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindowInteractor.h>
 
 int main(int, char *argv[])
 {
