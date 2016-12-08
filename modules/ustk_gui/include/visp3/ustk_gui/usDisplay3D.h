@@ -47,19 +47,19 @@
 #include <visp3/ustk_core/usImagePostScan3D.h>
 
 // some standard vtk headers
-#include <vtk/vtkSmartPointer.h>
-#include <vtk/vtkRenderWindow.h>
-#include <vtk/vtkRenderWindowInteractor.h>
-#include <vtk/vtkRenderer.h>
+#include <vtkSmartPointer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
 
 // headers needed for this example
-#include <vtk/vtkImageData.h>
-#include <vtk/vtkImageMapper3D.h>
-#include <vtk/vtkImageCast.h>
-#include <vtk/vtkMetaImageWriter.h>
-#include <vtk/vtkMetaImageReader.h>
-#include <vtk/vtkImageActor.h>
-#include <vtk/vtkAutoInit.h>
+#include <vtkImageData.h>
+#include <vtkImageMapper3D.h>
+#include <vtkImageCast.h>
+#include <vtkMetaImageWriter.h>
+#include <vtkMetaImageReader.h>
+#include <vtkImageActor.h>
+#include <vtkAutoInit.h>
 
 /**
  * @class usDisplay3D
