@@ -31,13 +31,12 @@
 
 //ustk
 #include <visp3/ustk_io/usImageIo.h>
-#include <visp3/ustk_gui/usViewer3D.h>
+#include <visp3/ustk_gui/usViewer2D.h>
 
 
 int main()
 {
-  usViewer3D viewer = usViewer3D();
+  usViewer2D viewer = usViewer2D();
   viewer.start();
-
   return 0;
 }

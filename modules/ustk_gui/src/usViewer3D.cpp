@@ -1,0 +1,188 @@
+/****************************************************************************
+ *
+ * This file is part of the UsTk software.
+ * Copyright (C) 2014 by Inria. All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License ("GPL") as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * See the file COPYING at the root directory of this source
+ * distribution for additional information about the GNU GPL.
+ *
+ * This software was developed at:
+ * INRIA Rennes - Bretagne Atlantique
+ * Campus Universitaire de Beaulieu
+ * 35042 Rennes Cedex
+ * France
+ * http://www.irisa.fr/lagadic
+ *
+ * If you have questions regarding the use of this file, please contact the
+ * authors at Alexandre.Krupa@inria.fr
+ *
+ * This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ * WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ *
+ * Authors:
+ * Marc Pouliquen
+ *
+ *****************************************************************************/
+
+#include <visp3/ustk_gui/usViewer3D.h>
+
+/**
+* Default constructor.
+*/
+usViewer3D::usViewer3D()
+{
+    vtkSmartPointer<vtkMetaImageReader> reader =
+    vtkSmartPointer<vtkMetaImageReader>::New();
+  reader->SetFileName("/home/mpouliqu/Documents/usData/postscan/3D/postscan3d.mhd");
+  reader->Update();
+
+  m_image = reader->GetOutput();
+
+  m_imageResliceMapperX = vtkSmartPointer<vtkImageResliceMapper>::New();
+  m_imageResliceMapperY = vtkSmartPointer<vtkImageResliceMapper>::New();
+  m_imageResliceMapperZ = vtkSmartPointer<vtkImageResliceMapper>::New();
+#if VTK_MAJOR_VERSION <= 5
+  m_imageResliceMapperX->SetInputConnection(reader->GetOutputPort());
+  m_imageResliceMapperY->SetInputConnection(reader->GetOutputPort());
+  m_imageResliceMapperZ->SetInputConnection(reader->GetOutputPort());
+#else
+  m_imageResliceMapperX->SetInputData(reader->GetOutput());
+  m_imageResliceMapperY->SetInputData(reader->GetOutput());
+  m_imageResliceMapperZ->SetInputData(reader->GetOutput());
+#endif
+
+  //plane widget to control the slicing
+  //vtkSmartPointer<vtkImagePlaneWidget> planeWidget;
+  //planeWidget->SetInputData(reader->GetOutput());
+  //planeWidget->SetPlaneOrientationToXAxes();
+  //Hard coded plane selection
+  //planeWidget->SetSliceIndex(10);
+
+  m_image->SetOrigin(0,0,0);
+
+
+  m_planeX = vtkSmartPointer<vtkPlane>::New();
+  m_planeX->SetNormal(1,0,0);
+  m_planeX->SetOrigin(50,0,0);
+  m_planeY = vtkSmartPointer<vtkPlane>::New();
+  m_planeY->SetNormal(0,1,0);
+  m_planeY->SetOrigin(0,100,0);
+  m_planeZ = vtkSmartPointer<vtkPlane>::New();
+  m_planeZ->SetNormal(0,0,1);
+  m_planeZ->SetOrigin(0,0,50);
+
+  //select plane
+  m_imageResliceMapperX->SetSlicePlane(m_planeX);
+  m_imageResliceMapperY->SetSlicePlane(m_planeY);
+  m_imageResliceMapperZ->SetSlicePlane(m_planeZ);
+
+  m_imageSliceX = vtkSmartPointer<vtkImageSlice>::New();
+  m_imageSliceX->SetMapper(m_imageResliceMapperX);
+  m_imageSliceY = vtkSmartPointer<vtkImageSlice>::New();
+  m_imageSliceY->SetMapper(m_imageResliceMapperY);
+  m_imageSliceZ = vtkSmartPointer<vtkImageSlice>::New();
+  m_imageSliceZ->SetMapper(m_imageResliceMapperZ);
+
+  // Setup renderers
+  m_renderer = vtkSmartPointer<vtkRenderer>::New();
+  m_renderer->AddActor(m_imageSliceX);
+  m_renderer->AddActor(m_imageSliceY);
+  m_renderer->AddActor(m_imageSliceZ);
+  m_renderer->SetBackground(0.5, 0.5, 0.5);
+  m_renderer->ResetCamera();
+
+  // Setup render window
+  m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+  m_renderWindow->SetSize(300, 300);
+  m_renderWindow->AddRenderer(m_renderer);
+
+  // Setup render window interactor
+  m_renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+
+  m_interactorStyle = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+
+  m_renderWindowInteractor->SetInteractorStyle(m_interactorStyle);
+
+  // Render and start interaction
+  m_renderWindowInteractor->SetRenderWindow(m_renderWindow);
+  m_renderWindowInteractor->Initialize();
+}
+
+/**
+* Destructor.
+*/
+usViewer3D::~usViewer3D()
+{
+
+}
+
+/**
+* Size setter of the view.
+* @param height Height of the view in pixels.
+* @param width Width of the view in pixels.
+*
+*/
+void usViewer3D::setSize(int height, int width)
+{
+  m_renderWindow->SetSize(height, width);
+}
+
+/**
+* Start interaction.
+*
+*/
+void usViewer3D::start()
+{
+ m_renderWindowInteractor->Start();
+}
+
+/**
+* Slice the X plane.
+* @param sliceNumber Slice number of the image to display, in X axis.
+*
+*/
+void usViewer3D::sliceX(int sliceNumber)
+{
+  int dims[3];
+  m_image->GetDimensions(dims);
+  if(sliceNumber < 0 || sliceNumber > dims[0])
+   throw(vpException(vpException::badValue,"X slice number out of image"));
+
+  m_planeX->SetOrigin(sliceNumber,0,0);
+}
+
+/**
+* Slice the Y plane.
+* @param sliceNumber Slice number of the image to display, in Y axis.
+*
+*/
+void usViewer3D::sliceY(int sliceNumber)
+{
+  int dims[3];
+  m_image->GetDimensions(dims);
+  if(sliceNumber < 0 || sliceNumber > dims[1])
+   throw(vpException(vpException::badValue,"Y slice number out of image"));
+
+  m_planeY->SetOrigin(0,sliceNumber,0);
+}
+
+/**
+* Slice the Z plane.
+* @param sliceNumber Slice number of the image to display, in Z axis.
+*
+*/
+void usViewer3D::sliceZ(int sliceNumber)
+{
+  int dims[3];
+  m_image->GetDimensions(dims);
+  if(sliceNumber < 0 || sliceNumber > dims[2])
+   throw(vpException(vpException::badValue,"Z slice number out of image"));
+
+  m_planeZ->SetOrigin(0,0,sliceNumber);
+}
+

@@ -1,4 +1,4 @@
-vp_add_module(ustk_gui visp_core visp_io visp_gui visp_ustk_core visp_ustk_io)
+vp_add_module(ustk_gui visp_ustk_core)
 
 if(NOT VTK_FOUND)
   VP_OPTION(USE_VTK       VTK        ""    "Include vtk support"          "" ON)
