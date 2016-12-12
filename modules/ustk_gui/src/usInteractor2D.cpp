@@ -30,8 +30,8 @@
  *****************************************************************************/
 
 /**
- * @file usDisplay3D.h
- * @brief Class to display a ultrasound image at screen, and interact with it.
+ * @file usViewer2D.h
+ * @brief Class to display a 3D ultrasound image at screen (3 orthogonal planes), and interact with it.
  */
 
 #ifndef US_DISPLAY_3D_H
@@ -46,60 +46,73 @@
 #include <visp3/ustk_core/usImagePostScan2D.h>
 #include <visp3/ustk_core/usImagePostScan3D.h>
 
-// some standard vtk headers
+// vtk headers
+#include <vtkVersion.h>
+#include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyleImage.h>
 #include <vtkRenderer.h>
-
-// headers needed for this example
-#include <vtkImageData.h>
-#include <vtkImageMapper3D.h>
-#include <vtkImageCast.h>
-#include <vtkMetaImageWriter.h>
+#include <vtkImageMapper.h>
+#include <vtkImageResliceMapper.h>
+#include <vtkImageSlice.h>
 #include <vtkMetaImageReader.h>
-#include <vtkImageActor.h>
-#include <vtkAutoInit.h>
+#include <vtkImagePlaneWidget.h>
+#include <vtkPlane.h>
+#include <vtkImageViewer2.h>
+#include <vtkDICOMImageReader.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkActor2D.h>
+#include <vtkTextProperty.h>
+#include <vtkTextMapper.h>
 
 /**
- * @class usDisplay3D
- * @brief Class to display a ultrasound image at screen, and interact with it.
+ * @class usViewer2D
+ * @brief Class to display a 3D ultrasound image at screen, and interact with it.
  * @ingroup module_ustk_gui
  */
-class VISP_EXPORT usDisplay3D
+class VISP_EXPORT usViewer2D
 {
 public:
 
-  usDisplay3D();
+  usViewer2D();
 
-  virtual ~usDisplay3D();
+  virtual ~usViewer2D();
+
+  void setSize(int height, int width);
 
 
-  /**
-   * Initialization method.
-   *
-   * @param renderWinInteractor Pointer to the vtk render window interactor.
-   * @param window_width Window width.
-   * @param window_height Window height.
-   * @param image_origin Coordinates of the image origin.
-   * @param image_dims Image dimensions.
-   * @param nSliceIdx_X Index of the rendered slice in the X direction.
-   * @param nSliceIdx_Y Index of the rendered slice in the Y direction.
-   * @param nSliceIdx_Z Index of the rendered slice in the Z direction.
-   * @param nCamRotAngle_X Renderer camera angle.
-   * @param nCamRotAngle_Y Renderer camera angle.
-   * @param nCamRotAngle_Z Renderer camera angle.
-   * @param nCamFarCls_t Renderer camera position.
-   */
-  void Init(vtkRenderWindowInteractor *renderWinInteractor, int window_width,  int window_height,
-            int image_origin[3], int image_dims[3], int nSliceIdx_X, int nSliceIdx_Y, int nSliceIdx_Z,
-            int nCamRotAngle_X, int nCamRotAngle_Y, int nCamRotAngle_Z, int nCamFarCls_t);
+private:
+  //mappers
+  vtkSmartPointer<vtkImageResliceMapper> m_imageResliceMapperX;
+  vtkSmartPointer<vtkImageResliceMapper> m_imageResliceMapperY;
+  vtkSmartPointer<vtkImageResliceMapper> m_imageResliceMapperZ;
 
-  /**
-   * Renders the volume.
-   */
-  void render(const unsigned char *image_data, int data_size);
+  //planes used to select the slice to display
+  vtkSmartPointer<vtkPlane> m_planeX;
+  vtkSmartPointer<vtkPlane> m_planeY;
+  vtkSmartPointer<vtkPlane> m_planeZ;
 
+  //ImageSlices (actors)
+  vtkSmartPointer<vtkImageSlice> m_imageSliceX;
+  vtkSmartPointer<vtkImageSlice> m_imageSliceY;
+  vtkSmartPointer<vtkImageSlice> m_imageSliceZ;
+
+  //Renderer
+  vtkSmartPointer<vtkRenderer> m_renderer;
+
+  //RenderWindow
+  vtkSmartPointer<vtkRenderWindow> m_renderWindow;
+
+  //Interactor
+  vtkSmartPointer<vtkRenderWindowInteractor> m_renderWindowInteractor;
+
+  //interaction style
+  vtkSmartPointer<vtkInteractorStyleTrackballCamera> m_interactorStyle;
+
+  //Image
+  vtkSmartPointer<vtkImageData> m_image;
 };
 
 #endif //US_DISPLAY_3D_H
