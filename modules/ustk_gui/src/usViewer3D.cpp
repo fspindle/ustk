@@ -56,6 +56,7 @@ usViewer3D::usViewer3D()
   m_imageResliceMapperZ->SetInputData(reader->GetOutput());
 #endif
 
+
   //plane widget to control the slicing
   //vtkSmartPointer<vtkImagePlaneWidget> planeWidget;
   //planeWidget->SetInputData(reader->GetOutput());
@@ -96,6 +97,7 @@ usViewer3D::usViewer3D()
   m_renderer->SetBackground(0.5, 0.5, 0.5);
   m_renderer->ResetCamera();
 
+
   // Setup render window
   m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
   m_renderWindow->SetSize(300, 300);
@@ -111,6 +113,8 @@ usViewer3D::usViewer3D()
   // Render and start interaction
   m_renderWindowInteractor->SetRenderWindow(m_renderWindow);
   m_renderWindowInteractor->Initialize();
+
+  m_renderWindow->Render();
 }
 
 /**
@@ -148,12 +152,14 @@ void usViewer3D::start()
 */
 void usViewer3D::sliceX(int sliceNumber)
 {
+  std::cout << "slice x, number" << sliceNumber << std::endl;
   int dims[3];
   m_image->GetDimensions(dims);
   if(sliceNumber < 0 || sliceNumber > dims[0])
    throw(vpException(vpException::badValue,"X slice number out of image"));
 
   m_planeX->SetOrigin(sliceNumber,0,0);
+  m_renderWindow->Render();
 }
 
 /**
@@ -186,3 +192,85 @@ void usViewer3D::sliceZ(int sliceNumber)
   m_planeZ->SetOrigin(0,0,sliceNumber);
 }
 
+/**
+* Get the matrix corresponding to X image slice.
+* @return The 4*4 matrix
+*/
+vtkMatrix4x4* usViewer3D::getXSliceMatrix()
+{
+  return m_imageSliceX->GetMatrix();
+}
+
+/**
+* Get the matrix corresponding to Y image slice.
+* @return The 4*4 matrix
+*/
+vtkMatrix4x4* usViewer3D::getYSliceMatrix()
+{
+  return m_imageSliceY->GetMatrix();
+}
+
+/**
+* Get the matrix corresponding to Z image slice.
+* @return The 4*4 matrix
+*/
+vtkMatrix4x4* usViewer3D::getZSliceMatrix()
+{
+  return m_imageSliceZ->GetMatrix();
+}
+
+/**
+* Get the origin of the X slice plane.
+* @return Array of 3 doubles containig the origin coordinates
+*/
+double* usViewer3D::getXSliceOrigin()
+{
+  return m_planeX->GetOrigin();
+}
+
+/**
+* Get the origin of the Y slice plane.
+* @return Array of 3 doubles containig the origin coordinates
+*/
+double* usViewer3D::getYSliceOrigin()
+{
+  return m_planeY->GetOrigin();
+}
+
+/**
+* Get the origin of the X slice plane.
+* @return Array of 3 doubles containig the origin coordinates
+*/
+double* usViewer3D::getZSliceOrigin()
+{
+  return m_planeZ->GetOrigin();
+}
+
+
+
+/**
+* Get the X plane.
+* @return vtkPlane
+*/
+vtkPlane* usViewer3D::getXPlane()
+{
+  return m_planeX;
+}
+
+/**
+* Get the Y plane.
+* @return vtkPlane
+*/
+vtkPlane* usViewer3D::getYPlane()
+{
+  return m_planeY;
+}
+
+/**
+* Get the Z plane.
+* @return vtkPlane
+*/
+vtkPlane* usViewer3D::getZPlane()
+{
+  return m_planeZ;
+}

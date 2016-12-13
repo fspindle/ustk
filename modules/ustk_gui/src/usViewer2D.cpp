@@ -34,77 +34,69 @@
 /**
 * Default constructor.
 */
-usViewer2D::usViewer2D()
+usViewer2D::usViewer2D(vtkPlane *plane, double* origin)
 {
   vtkSmartPointer<vtkMetaImageReader> reader =
       vtkSmartPointer<vtkMetaImageReader>::New();
   reader->SetFileName("/home/mpouliqu/Documents/usData/postscan/3D/postscan3d.mhd");
   reader->Update();
 
-  // Visualize
-  m_imageViewer = vtkSmartPointer<vtkImageViewer2>::New();
-  m_imageViewer->SetInputConnection(reader->GetOutputPort());
+    //2D plane separate display test
+  m_imageReslice = vtkSmartPointer<vtkImageReslice>::New();
+  m_imageReslice->SetInputData(reader->GetOutput());
+  //m_imageReslice->SetOutputDimensionality(2);
 
-  std::cout << "1" << std::endl;
-  //m_imageViewer->SetSliceOrientationToYZ();
-  //std::cout << m_imageViewer->GetSliceOrientation() << std::endl;
+  std::cout << "origin = " << origin[0] << ", "<< origin[1] << ", "<< origin[2] << std::endl;
+  //m_imageReslice->SetInformationInput(reader->GetOutput());
+  m_imageReslice->SetInterpolationModeToLinear();
 
-  //this->setOrientation(usViewer2D::Yorientation);
 
-  // slice status message
-  std::cout << "2" << std::endl;
-  m_sliceTextProp = vtkSmartPointer<vtkTextProperty>::New();
-  m_sliceTextProp->SetFontFamilyToCourier();
-  m_sliceTextProp->SetFontSize(20);
-  m_sliceTextProp->SetVerticalJustificationToBottom();
-  m_sliceTextProp->SetJustificationToLeft();
 
-  std::cout << "3" << std::endl;
-  m_sliceTextMapper = vtkSmartPointer<vtkTextMapper>::New();
-  std::stringstream tmp;
-  tmp << "Slice " << m_imageViewer->GetSliceMin() + 1 << "/" << m_imageViewer->GetSliceMax() + 1;
-  std::string msg = tmp.str();
-  m_sliceTextMapper->SetInput(msg.c_str());
-  m_sliceTextMapper->SetTextProperty(m_sliceTextProp);
 
-  std::cout << "4" << std::endl;
-  m_sliceTextActor = vtkSmartPointer<vtkActor2D>::New();
-  m_sliceTextActor->SetMapper(m_sliceTextMapper);
-  m_sliceTextActor->SetPosition(15, 10);
+  // Create a greyscale lookup table
+  m_table = vtkSmartPointer<vtkLookupTable>::New();
+  m_table->SetRange(0, 500); // image intensity range
+  m_table->SetValueRange(0.0, 1.0); // from black to white
+  m_table->SetSaturationRange(0.0, 0.0); // no color saturation
+  m_table->SetRampToLinear();
+  m_table->Build();
 
-  std::cout << "5" << std::endl;
-  // create an interactor with our own style (inherit from vtkInteractorStyleImage)
-  // in order to catch mousewheel and key events
-  m_renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  // Map the image through the lookup table
+  m_color = vtkSmartPointer<vtkImageMapToColors>::New();
+  m_color->SetLookupTable(m_table);
+  m_color->SetInputConnection(m_imageReslice->GetOutputPort());
 
+  //map the slice in the volume
+  m_resliceMapper = vtkSmartPointer<vtkImageResliceMapper>::New();
+  m_resliceMapper->SetInputConnection(m_color->GetOutputPort());
+  m_resliceMapper->SetSlicePlane(plane);
+  //m_resliceMapper->SliceFacesCameraOn();
+  //m_resliceMapper->SliceAtFocalPointOn();
+
+  // Display the image
+  m_actor = vtkSmartPointer<vtkImageActor>::New();
+  m_actor->SetMapper(m_resliceMapper);
+
+
+  m_imageSlice = vtkSmartPointer<vtkImageSlice>::New();
+  m_imageSlice->SetMapper(m_resliceMapper);
+
+  m_renderer = vtkSmartPointer<vtkRenderer>::New();
+  m_renderer->AddActor2D(m_imageSlice);
+  m_renderer->ResetCamera();
+
+  m_window = vtkSmartPointer<vtkRenderWindow>::New();
+  m_window->AddRenderer(m_renderer);
+
+  // Set up the interaction
   m_interactorStyle = vtkSmartPointer<usInteractor2D>::New();
-  std::cout << "6" << std::endl;
 
-  // make imageviewer2 and sliceTextMapper visible to our interactorstyle
-  // to enable slice status message updates when scrolling through the slices
-  m_interactorStyle->SetImageViewer(m_imageViewer);
-  m_interactorStyle->SetStatusMapper(m_sliceTextMapper);
 
-  std::cout << "7" << std::endl;
-  m_imageViewer->SetupInteractor(m_renderWindowInteractor);
-  // make the interactor use our own interactorstyle
-  // cause SetupInteractor() is defining it's own default interatorstyle
-  // this must be called after SetupInteractor()
+  m_renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   m_renderWindowInteractor->SetInteractorStyle(m_interactorStyle);
-  // add slice status message and usage hint message to the renderer
-  m_imageViewer->GetRenderer()->AddActor2D(m_sliceTextActor);
+  m_window->SetInteractor(m_renderWindowInteractor);
 
-  std::cout << "8" << std::endl;
-  // initialize rendering and interaction
-  //imageViewer->GetRenderWindow()->SetSize(400, 300);
-  //imageViewer->GetRenderer()->SetBackground(0.2, 0.3, 0.4);
-  std::cout << "9" << std::endl;
-  m_imageViewer->Render();
-  std::cout << "10" << std::endl;
-  m_imageViewer->GetRenderer()->ResetCamera();
-  std::cout << "11" << std::endl;
-  m_imageViewer->Render();
-  std::cout << "12" << std::endl;
+  m_window->Render();
 }
 
 /**
@@ -124,10 +116,21 @@ void usViewer2D::start()
 }
 
 /**
+* Init interactor.
+*/
+void usViewer2D::initInteractorStyle(usViewer3D* viewer)
+{
+  m_interactorStyle->SetImageViewer(m_imageReslice,0,10,0);
+  m_interactorStyle->SetViewer3D(viewer);
+  m_interactorStyle->SetRenderWindow2D(m_window);
+}
+
+/**
 * Set orientation of th view.
 */
 void usViewer2D::setOrientation(usViewer2D::Orientation orientation)
 {
+/*
   std::cout << "setOrientation" << std::endl;
   if(orientation == usViewer2D::Xorientation)
     m_imageViewer->SetSliceOrientationToYZ();
@@ -136,6 +139,12 @@ void usViewer2D::setOrientation(usViewer2D::Orientation orientation)
   else if(orientation == usViewer2D::Zorientation)
     m_imageViewer->SetSliceOrientationToXY();
   std::cout << "setOrientation end" << std::endl;
-  m_imageViewer->UpdateDisplayExtent();
+  m_imageViewer->UpdateDisplayExtent();*/
 }
 
+/**
+* Set orientation of th view.
+*/
+void usViewer2D::updateView() {
+  m_imageReslice->Update();
+}

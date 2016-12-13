@@ -36,7 +36,7 @@
 
 int main()
 {
-  usViewer2D viewer = usViewer2D();
-  viewer.start();
+  //usViewer2D viewer = usViewer2D();
+  //viewer.start();
   return 0;
 }
