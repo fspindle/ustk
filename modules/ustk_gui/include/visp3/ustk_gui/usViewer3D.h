@@ -34,8 +34,8 @@
  * @brief Class to display a 3D ultrasound image at screen (3 orthogonal planes), and interact with it.
  */
 
-#ifndef US_DISPLAY_3D_H
-#define US_DISPLAY_3D_H
+#ifndef US_VIEWER_3D_H
+#define US_VIEWER_3D_H
 
 #include <string>
 
@@ -56,10 +56,15 @@
 #include <vtkRenderer.h>
 #include <vtkImageMapper.h>
 #include <vtkImageResliceMapper.h>
+#include <vtkImageReslice.h>
 #include <vtkImageSlice.h>
 #include <vtkMetaImageReader.h>
 #include <vtkImagePlaneWidget.h>
 #include <vtkPlane.h>
+#include <vtkCamera.h>
+#include <vtkLookupTable.h>
+#include <vtkImageMapToColors.h>
+#include <vtkImageActor.h>
 
 /**
  * @class usViewer3D
@@ -73,6 +78,19 @@ public:
   usViewer3D();
 
   virtual ~usViewer3D();
+
+  //getters
+  vtkMatrix4x4* getXSliceMatrix();
+  vtkMatrix4x4* getYSliceMatrix();
+  vtkMatrix4x4* getZSliceMatrix();
+
+  double* getXSliceOrigin();
+  double* getYSliceOrigin();
+  double* getZSliceOrigin();
+
+  vtkPlane* getXPlane();
+  vtkPlane* getYPlane();
+  vtkPlane* getZPlane();
 
   void setSize(int height, int width);
 
@@ -114,4 +132,4 @@ private:
   vtkSmartPointer<vtkImageData> m_image;
 };
 
-#endif //US_DISPLAY_3D_H
+#endif //US_VIEWER_3D_H

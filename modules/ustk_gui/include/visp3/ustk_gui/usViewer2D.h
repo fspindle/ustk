@@ -34,8 +34,8 @@
  * @brief Class to display a 3D ultrasound image at screen (3 orthogonal planes), and interact with it.
  */
 
-#ifndef US_DISPLAY_3D_H
-#define US_DISPLAY_3D_H
+#ifndef US_VIEWER_2D_H
+#define US_VIEWER_2D_H
 
 #include <string>
 
@@ -68,6 +68,27 @@
 #include <vtkTextProperty.h>
 #include <vtkTextMapper.h>
 
+#include <vtkVersion.h>
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkRenderer.h>
+#include <vtkImageMapper.h>
+#include <vtkImageResliceMapper.h>
+#include <vtkImageReslice.h>
+#include <vtkImageSlice.h>
+#include <vtkMetaImageReader.h>
+#include <vtkImagePlaneWidget.h>
+#include <vtkPlane.h>
+#include <vtkCamera.h>
+#include <vtkLookupTable.h>
+#include <vtkImageMapToColors.h>
+#include <vtkImageActor.h>
+#include <vtkAbstractTransform.h>
+
+
 //UsTK includes
 #include <visp3/ustk_gui/usInteractor2D.h>
 
@@ -82,14 +103,16 @@ public:
 
  /*! Enum to set the orientation of a 2D plane from a 3D image.*/
 typedef enum {
-    Xorientation,        /*!< Case of 2D RF image. */
-    Yorientation,        /*!< Case of 3D RF image. */
-    Zorientation,        /*!< Case of 2D pre-scan image. */
+    Xorientation,
+    Yorientation,
+    Zorientation,
   }Orientation;
 
-  usViewer2D();
+  usViewer2D(vtkPlane *plane, double* origin);
 
   virtual ~usViewer2D();
+
+  void initInteractorStyle(usViewer3D* viewer);
 
   void setSize(int height, int width);
 
@@ -97,7 +120,36 @@ typedef enum {
 
   void start();
 
+  void updateView();
+
 private:
+  //vtkImageReslice
+  vtkSmartPointer<vtkImageReslice> m_imageReslice;
+
+  vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper;
+  //LUT
+  vtkSmartPointer<vtkLookupTable> m_table;
+
+  //Color map
+  vtkSmartPointer<vtkImageMapToColors> m_color;
+
+  //actor
+  vtkSmartPointer<vtkImageActor> m_actor;
+  vtkSmartPointer<vtkImageSlice> m_imageSlice;
+
+  //renderer
+  vtkSmartPointer<vtkRenderer> m_renderer;
+
+  //render window
+  vtkSmartPointer<vtkRenderWindow> m_window;
+
+  //render window interactor
+  vtkSmartPointer<vtkRenderWindowInteractor> m_renderWindowInteractor;
+
+  //interactor style
+  vtkSmartPointer<usInteractor2D> m_interactorStyle;
+
+  /*
   //viewer
   vtkSmartPointer<vtkImageViewer2> m_imageViewer;
 
@@ -110,14 +162,9 @@ private:
   //slice text actor
   vtkSmartPointer<vtkActor2D> m_sliceTextActor;
 
-  //render window interactor
-  vtkSmartPointer<vtkRenderWindowInteractor> m_renderWindowInteractor;
-
-  //interactor style
-  vtkSmartPointer<usInteractor2D> m_interactorStyle;
 
   //Image
-  vtkSmartPointer<vtkImageData> m_image;
+  vtkSmartPointer<vtkImageData> m_image;*/
 };
 
-#endif //US_DISPLAY_3D_H
+#endif //US_VIEWER_2D_H

@@ -32,12 +32,21 @@
 //ustk
 #include <visp3/ustk_io/usImageIo.h>
 #include <visp3/ustk_gui/usViewer3D.h>
+#include <visp3/ustk_gui/usViewer2D.h>
+#include <vtkMatrix4x4.h>
+#include <vtkAbstractTransform.h>
 
 
 int main()
 {
-  usViewer3D viewer = usViewer3D();
-  viewer.start();
+  usViewer3D viewer3D = usViewer3D();
+
+  usViewer2D viewer2D = usViewer2D(viewer3D.getXPlane(),viewer3D.getXSliceOrigin());
+
+  viewer2D.initInteractorStyle(&viewer3D);
+
+  viewer3D.start();
+  viewer2D.start();
 
   return 0;
 }

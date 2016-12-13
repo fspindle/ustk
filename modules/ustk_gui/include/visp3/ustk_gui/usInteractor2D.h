@@ -4,6 +4,8 @@
 
 //ViSP includes
 #include<visp3/core/vpConfig.h>
+#include<visp3/ustk_gui/usViewer2D.h>
+#include<visp3/ustk_gui/usViewer3D.h>
 
 //VTK includes
 #include<vtkInteractorStyleImage.h>
@@ -29,24 +31,37 @@ public:
    vtkTypeMacro(usInteractor2D, vtkInteractorStyleImage);
 
 protected:
-   vtkImageViewer2* _ImageViewer;
+   usViewer3D* m_viewer3D;
+   vtkSmartPointer<vtkImageReslice> m_reslice2D;
+   vtkSmartPointer<vtkRenderWindow> m_window2D;
+   //usViewer2D::Orientation m_orientation;
+
    vtkTextMapper* _StatusMapper;
+
    int _Slice;
    int _MinSlice;
    int _MaxSlice;
 
 public:
-   void SetImageViewer(vtkImageViewer2* imageViewer) {
-      _ImageViewer = imageViewer;
+   void SetImageViewer(vtkImageReslice* imageReslice, int sliceMin, int sliceMax, int initSlice) {
+      m_reslice2D = imageReslice;
 
-      _MinSlice = imageViewer->GetSliceMin();
-      _MaxSlice = imageViewer->GetSliceMax();
-      _Slice = _MinSlice;
+      _MinSlice = sliceMin;
+      _MaxSlice = sliceMax;
+      _Slice = initSlice;
       cout << "Slicer: Min = " << _MinSlice << ", Max = " << _MaxSlice << std::endl;
    }
 
    void SetStatusMapper(vtkTextMapper* statusMapper) {
       _StatusMapper = statusMapper;
+   }
+
+   void SetViewer3D(usViewer3D* viewer3D) {
+      m_viewer3D = viewer3D;
+   }
+
+   void SetRenderWindow2D(vtkRenderWindow* window) {
+      m_window2D = window;
    }
 
 
@@ -55,12 +70,14 @@ protected:
       if(_Slice < _MaxSlice) {
          _Slice += 1;
          cout << "MoveSliceForward::Slice = " << _Slice << std::endl;
-         _ImageViewer->SetSlice(_Slice);
+         m_viewer3D->sliceX(_Slice);
          std::stringstream tmp;
          tmp << "Slice " << _Slice + 1 << "/" << _MaxSlice + 1;
          std::string msg = tmp.str();
-         _StatusMapper->SetInput(msg.c_str());
-         _ImageViewer->Render();
+         //_StatusMapper->SetInput(msg.c_str());
+         m_reslice2D->SetResliceAxesOrigin(0,0,_Slice);
+         m_reslice2D->Update();
+         m_window2D->Render();
       }
    }
 
@@ -68,12 +85,14 @@ protected:
       if(_Slice > _MinSlice) {
          _Slice -= 1;
          cout << "MoveSliceBackward::Slice = " << _Slice << std::endl;
-         _ImageViewer->SetSlice(_Slice);
+         m_viewer3D->sliceX(_Slice);
          std::stringstream tmp;
          tmp << "Slice " << _Slice + 1 << "/" << _MaxSlice + 1;
          std::string msg = tmp.str();
-         _StatusMapper->SetInput(msg.c_str());
-         _ImageViewer->Render();
+         //_StatusMapper->SetInput(msg.c_str());
+         m_reslice2D->SetResliceAxesOrigin(0,0,_Slice);
+         m_reslice2D->Update();
+         m_window2D->Render();
       }
    }
 
