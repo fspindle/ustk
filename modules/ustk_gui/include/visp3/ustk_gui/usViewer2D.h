@@ -91,6 +91,8 @@
 
 //UsTK includes
 #include <visp3/ustk_gui/usInteractor2D.h>
+#include <visp3/ustk_gui/usSlicingCallback.h>
+
 
 /**
  * @class usViewer2D
@@ -108,7 +110,7 @@ typedef enum {
     Zorientation,
   }Orientation;
 
-  usViewer2D(vtkPlane *plane, double* origin);
+  usViewer2D(usViewer2D::Orientation orientation, int slice);
 
   virtual ~usViewer2D();
 

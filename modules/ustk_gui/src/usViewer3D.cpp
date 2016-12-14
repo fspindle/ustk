@@ -42,6 +42,7 @@ usViewer3D::usViewer3D()
   reader->Update();
 
   m_image = reader->GetOutput();
+  m_image->GetDimensions(m_imageDims);
 
   m_imageResliceMapperX = vtkSmartPointer<vtkImageResliceMapper>::New();
   m_imageResliceMapperY = vtkSmartPointer<vtkImageResliceMapper>::New();
@@ -152,13 +153,13 @@ void usViewer3D::start()
 */
 void usViewer3D::sliceX(int sliceNumber)
 {
-  std::cout << "slice x, number" << sliceNumber << std::endl;
-  int dims[3];
-  m_image->GetDimensions(dims);
-  if(sliceNumber < 0 || sliceNumber > dims[0])
-   throw(vpException(vpException::badValue,"X slice number out of image"));
+  std::cout << "sliceX 0" << std::endl;
+  //if(sliceNumber < 0 || sliceNumber > m_imageDims[0])
+//   /throw(vpException(vpException::badValue,"X slice number out of image"));
 
+  std::cout << "sliceX 1" << std::endl;
   m_planeX->SetOrigin(sliceNumber,0,0);
+  std::cout << "sliceX 2" << std::endl;
   m_renderWindow->Render();
 }
 
@@ -169,9 +170,7 @@ void usViewer3D::sliceX(int sliceNumber)
 */
 void usViewer3D::sliceY(int sliceNumber)
 {
-  int dims[3];
-  m_image->GetDimensions(dims);
-  if(sliceNumber < 0 || sliceNumber > dims[1])
+  if(sliceNumber < 0 || sliceNumber > m_imageDims[1])
    throw(vpException(vpException::badValue,"Y slice number out of image"));
 
   m_planeY->SetOrigin(0,sliceNumber,0);
@@ -184,9 +183,7 @@ void usViewer3D::sliceY(int sliceNumber)
 */
 void usViewer3D::sliceZ(int sliceNumber)
 {
-  int dims[3];
-  m_image->GetDimensions(dims);
-  if(sliceNumber < 0 || sliceNumber > dims[2])
+  if(sliceNumber < 0 || sliceNumber > m_imageDims[2])
    throw(vpException(vpException::badValue,"Z slice number out of image"));
 
   m_planeZ->SetOrigin(0,0,sliceNumber);

@@ -41,7 +41,7 @@ int main()
 {
   usViewer3D viewer3D = usViewer3D();
 
-  usViewer2D viewer2D = usViewer2D(viewer3D.getXPlane(),viewer3D.getXSliceOrigin());
+  usViewer2D viewer2D = usViewer2D(usViewer2D::Xorientation,(int)*viewer3D.getXSliceOrigin());
 
   viewer2D.initInteractorStyle(&viewer3D);
 

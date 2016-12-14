@@ -130,6 +130,7 @@ private:
 
   //Image
   vtkSmartPointer<vtkImageData> m_image;
+  int m_imageDims[3];
 };
 
 #endif //US_VIEWER_3D_H
