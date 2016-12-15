@@ -103,14 +103,7 @@ class VISP_EXPORT usViewer2D
 {
 public:
 
- /*! Enum to set the orientation of a 2D plane from a 3D image.*/
-typedef enum {
-    Xorientation,
-    Yorientation,
-    Zorientation,
-  }Orientation;
-
-  usViewer2D(usViewer2D::Orientation orientation, int slice);
+  usViewer2D(us::Orientation orientation, int slice);
 
   virtual ~usViewer2D();
 
@@ -118,55 +111,39 @@ typedef enum {
 
   void setSize(int height, int width);
 
-  void setOrientation(usViewer2D::Orientation orientation);
+  void setOrientation(us::Orientation orientation);
 
   void start();
 
   void updateView();
 
 private:
-  //vtkImageReslice
-  vtkSmartPointer<vtkImageReslice> m_imageReslice;
 
-  vtkSmartPointer<vtkImageResliceMapper> m_resliceMapper;
-  //LUT
+  vtkSmartPointer<vtkMatrix4x4> m_resliceAxes;
+
+  vtkSmartPointer<vtkImageReslice> m_reslice;
+
   vtkSmartPointer<vtkLookupTable> m_table;
 
-  //Color map
   vtkSmartPointer<vtkImageMapToColors> m_color;
 
-  //actor
   vtkSmartPointer<vtkImageActor> m_actor;
-  vtkSmartPointer<vtkImageSlice> m_imageSlice;
 
-  //renderer
   vtkSmartPointer<vtkRenderer> m_renderer;
 
-  //render window
+  vtkSmartPointer<vtkInteractorStyleImage> m_imageStyle;
+
+  vtkSmartPointer<vtkRenderWindowInteractor> m_interactor;
+
+  vtkSmartPointer<usSlicingCallback> m_callback;
+
   vtkSmartPointer<vtkRenderWindow> m_window;
 
-  //render window interactor
-  vtkSmartPointer<vtkRenderWindowInteractor> m_renderWindowInteractor;
-
-  //interactor style
-  vtkSmartPointer<usInteractor2D> m_interactorStyle;
-
-  /*
-  //viewer
-  vtkSmartPointer<vtkImageViewer2> m_imageViewer;
-
-  //slice text property
-  vtkSmartPointer<vtkTextProperty> m_sliceTextProp;
-
-  //slice text mapper
-  vtkSmartPointer<vtkTextMapper> m_sliceTextMapper;
-
-  //slice text actor
-  vtkSmartPointer<vtkActor2D> m_sliceTextActor;
-
-
   //Image
-  vtkSmartPointer<vtkImageData> m_image;*/
+  vtkSmartPointer<vtkImageData> m_image;
+
+  //plane orientation
+  us::Orientation m_orientation;
 };
 
 #endif //US_VIEWER_2D_H

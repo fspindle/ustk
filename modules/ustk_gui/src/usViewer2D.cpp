@@ -34,8 +34,10 @@
 /**
 * Default constructor.
 */
-usViewer2D::usViewer2D(usViewer2D::Orientation orientation ,int slice)
+usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
 {
+  m_orientation = orientation;
+
   vtkSmartPointer<vtkMetaImageReader> reader =
       vtkSmartPointer<vtkMetaImageReader>::New();
   reader->SetFileName("/home/mpouliqu/Documents/usData/postscan/3D/postscan3d.mhd");
@@ -46,13 +48,12 @@ usViewer2D::usViewer2D(usViewer2D::Orientation orientation ,int slice)
   //reader->SetDataScalarTypeToUnsignedShort();
   //reader->SetDataByteOrderToLittleEndian();
   reader->UpdateWholeExtent();
-
   // Calculate the center of the volume
   reader->Update();
+
   int extent[6];
   double spacing[3];
   double origin[3];
-
 
   reader->GetOutputInformation(0)->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
   reader->GetOutput()->GetSpacing(spacing);
@@ -63,24 +64,25 @@ usViewer2D::usViewer2D(usViewer2D::Orientation orientation ,int slice)
   center[1] = origin[1] + spacing[1] * 0.5 * (extent[2] + extent[3]);
   center[2] = origin[2] + spacing[2] * 0.5 * (extent[4] + extent[5]);
 
-  // Matrices for axial, coronal, sagittal, oblique view orientations
-  static double axialElements[16] = {
-           1, 0, 0, 0,
-           0, 1, 0, 0,
-           0, 0, 1, 0,
-           0, 0, 0, 1 };
+  // Matrice for view orientations
 
-  //static double coronalElements[16] = {
-  //         1, 0, 0, 0,
-  //         0, 0, 1, 0,
-  //         0,-1, 0, 0,
-  //         0, 0, 0, 1 };
+  double elements[16];
+  double XElements[16] = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1 };
+  double YElements[16] = {
+    1, 0, 0, 0,
+    0, 0, 1, 0,
+    0,-1, 0, 0,
+    0, 0, 0, 1 };
 
-  //static double sagittalElements[16] = {
-  //         0, 0,-1, 0,
-  //         1, 0, 0, 0,
-  //         0,-1, 0, 0,
-  //         0, 0, 0, 1 };
+  double ZElements[16] = {
+    0, 0,-1, 0,
+    1, 0, 0, 0,
+    0,-1, 0, 0,
+    0, 0, 0, 1 };
 
   //static double obliqueElements[16] = {
   //         1, 0, 0, 0,
@@ -88,72 +90,75 @@ usViewer2D::usViewer2D(usViewer2D::Orientation orientation ,int slice)
   //         0, 0.5, 0.866025, 0,
   //         0, 0, 0, 1 };
 
+  if(m_orientation == us::Xorientation) {
+    for(int i=0;i<16;i++)
+      elements[i] = XElements[i];
+  }
+  else if (m_orientation == us::Yorientation) {
+    for(int i=0;i<16;i++)
+      elements[i] = YElements[i];
+  }
+  else if (m_orientation == us::Zorientation) {
+    for(int i=0;i<16;i++)
+      elements[i] = ZElements[i];
+  }
+
+
   // Set the slice orientation
-  vtkSmartPointer<vtkMatrix4x4> resliceAxes =
-    vtkSmartPointer<vtkMatrix4x4>::New();
-  resliceAxes->DeepCopy(axialElements);
+  m_resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+  m_resliceAxes->DeepCopy(elements);
   // Set the point through which to slice
-  resliceAxes->SetElement(0, 3, center[0]);
-  resliceAxes->SetElement(1, 3, center[1]);
-  resliceAxes->SetElement(2, 3, slice);
+  m_resliceAxes->SetElement(0, 3, center[0]);
+  m_resliceAxes->SetElement(1, 3, center[1]);
+  m_resliceAxes->SetElement(2, 3, sliceOrigin);
 
   // Extract a slice in the desired orientation
-  vtkSmartPointer<vtkImageReslice> reslice =
-    vtkSmartPointer<vtkImageReslice>::New();
-  reslice->SetInputConnection(reader->GetOutputPort());
-  reslice->SetOutputDimensionality(2);
-  reslice->SetResliceAxes(resliceAxes);
-  reslice->SetInterpolationModeToLinear();
+  m_reslice = vtkSmartPointer<vtkImageReslice>::New();
+  m_reslice->SetInputConnection(reader->GetOutputPort());
+  m_reslice->SetOutputDimensionality(2);
+  m_reslice->SetResliceAxes(m_resliceAxes);
+  m_reslice->SetInterpolationModeToLinear();
 
   // Create a greyscale lookup table
-  vtkSmartPointer<vtkLookupTable> table =
-    vtkSmartPointer<vtkLookupTable>::New();
-  table->SetRange(0, 150); // image intensity range
-  table->SetValueRange(0.0, 1.0); // from black to white
-  table->SetSaturationRange(0.0, 0.0); // no color saturation
-  table->SetRampToLinear();
-  table->Build();
+  m_table = vtkSmartPointer<vtkLookupTable>::New();
+  m_table->SetRange(0, 255); // image intensity range
+  m_table->SetValueRange(0.0, 1.0); // from black to white
+  m_table->SetSaturationRange(0.0, 0.0); // no color saturation
+  m_table->SetRampToLinear();
+  m_table->Build();
 
   // Map the image through the lookup table
-  vtkSmartPointer<vtkImageMapToColors> color =
-    vtkSmartPointer<vtkImageMapToColors>::New();
-  color->SetLookupTable(table);
-  color->SetInputConnection(reslice->GetOutputPort());
+  m_color = vtkSmartPointer<vtkImageMapToColors>::New();
+  m_color->SetLookupTable(m_table);
+  m_color->SetInputConnection(m_reslice->GetOutputPort());
 
   // Display the image
-  vtkSmartPointer<vtkImageActor> actor =
-    vtkSmartPointer<vtkImageActor>::New();
-  actor->GetMapper()->SetInputConnection(color->GetOutputPort());
+  m_actor = vtkSmartPointer<vtkImageActor>::New();
+  m_actor->GetMapper()->SetInputConnection(m_color->GetOutputPort());
 
-  vtkSmartPointer<vtkRenderer> renderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  renderer->AddActor(actor);
+  m_renderer = vtkSmartPointer<vtkRenderer>::New();
+  m_renderer->AddActor(m_actor);
 
-  vtkSmartPointer<vtkRenderWindow> window =
-    vtkSmartPointer<vtkRenderWindow>::New();
-  window->AddRenderer(renderer);
+  m_window = vtkSmartPointer<vtkRenderWindow>::New();
+  m_window->AddRenderer(m_renderer);
 
   // Set up the interaction
-  vtkSmartPointer<vtkInteractorStyleImage> imageStyle =
-    vtkSmartPointer<vtkInteractorStyleImage>::New();
-  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  interactor->SetInteractorStyle(imageStyle);
-  window->SetInteractor(interactor);
-  window->Render();
+  m_imageStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
 
-  vtkSmartPointer<usSlicingCallback> callback =
-    vtkSmartPointer<usSlicingCallback>::New();
-  callback->SetImageReslice(reslice);
-  callback->SetInteractor(interactor);
+  m_interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+  m_interactor->SetInteractorStyle(m_imageStyle);
 
-  imageStyle->AddObserver(vtkCommand::MouseMoveEvent, callback);
-  imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, callback);
-  imageStyle->AddObserver(vtkCommand::LeftButtonReleaseEvent, callback);
+  m_window->SetInteractor(m_interactor);
+  m_window->Render();
 
-  // Start interaction
-  // The Start() method doesn't return until the window is closed by the user
-  interactor->Start();
+  m_callback = vtkSmartPointer<usSlicingCallback>::New();
+  m_callback->SetImageReslice(m_reslice);
+  m_callback->setSliceOrientation(m_orientation);
+  m_callback->SetInteractor(m_interactor);
+
+  m_imageStyle->AddObserver(vtkCommand::MouseMoveEvent, m_callback);
+  m_imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, m_callback);
+  m_imageStyle->AddObserver(vtkCommand::LeftButtonReleaseEvent, m_callback);
 }
 
 /**
@@ -169,7 +174,9 @@ usViewer2D::~usViewer2D()
 */
 void usViewer2D::start()
 {
-//  /m_renderWindowInteractor->Start();
+  // Start interaction
+  // The Start() method doesn't return until the window is closed by the user
+  m_interactor->Start();
 }
 
 /**
@@ -185,9 +192,9 @@ void usViewer2D::initInteractorStyle(usViewer3D* viewer)
 /**
 * Set orientation of th view.
 */
-void usViewer2D::setOrientation(usViewer2D::Orientation orientation)
+void usViewer2D::setOrientation(us::Orientation orientation)
 {
-/*
+  /*
   std::cout << "setOrientation" << std::endl;
   if(orientation == usViewer2D::Xorientation)
     m_imageViewer->SetSliceOrientationToYZ();

@@ -4,7 +4,9 @@
 
 //ViSP includes
 #include<visp3/core/vpConfig.h>
-#include<visp3/ustk_gui/usViewer2D.h>
+
+//UsTK includes
+#include<visp3/ustk_core/us.h>
 #include<visp3/ustk_gui/usViewer3D.h>
 
 //VTK includes
@@ -71,6 +73,10 @@ public:
     this->m_viewer3D = viewer3D;
   };
 
+  void setSliceOrientation(us::Orientation orientation) {
+    this->m_orientation = orientation;
+  };
+
   void Execute(vtkObject *, unsigned long event, void *) VTK_OVERRIDE
   {
     vtkRenderWindowInteractor *interactor = this->GetInteractor();
@@ -98,17 +104,25 @@ public:
         int deltaY = lastPos[1] - currPos[1];
 
         reslice->Update();
-        double sliceSpacing = reslice->GetOutput()->GetSpacing()[2];
+        double sliceSpacing;
+        if(m_orientation == us::Xorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[2];
+        }
+        else if(m_orientation == us::Yorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[1];
+        }
+        else if(m_orientation == us::Zorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[0];
+        }
         vtkMatrix4x4 *matrix = reslice->GetResliceAxes();
         // move the center point that we are slicing through
         double point[4];
-        double center[4];
         point[0] = 0.0;
         point[1] = 0.0;
         point[2] = sliceSpacing * deltaY;
         point[3] = 1.0;
+        double center[4];
         matrix->MultiplyPoint(point, center);
-        std::cout << "current slice : " << center[2] << std::endl;
         //m_viewer3D->sliceX(center[2]);
         matrix->SetElement(0, 3, center[0]);
         matrix->SetElement(1, 3, center[1]);
@@ -118,7 +132,7 @@ public:
       else
       {
         vtkInteractorStyle *style = vtkInteractorStyle::SafeDownCast(
-          interactor->GetInteractorStyle());
+              interactor->GetInteractorStyle());
         if (style)
         {
           style->OnMouseMove();
@@ -128,8 +142,11 @@ public:
   };
 
 private:
-  //Pointer to 3D Viewer to slince in it
-   usViewer3D* m_viewer3D;
+  //Pointer to 3D Viewer to slince in it //NOT USED FOR NOW
+  usViewer3D* m_viewer3D;
+
+  //Slice orientation
+  us::Orientation m_orientation;
 
   // Actions (slicing only, for now)
   int Slicing;
