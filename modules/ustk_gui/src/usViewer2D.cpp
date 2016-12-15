@@ -143,7 +143,7 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   m_window->AddRenderer(m_renderer);
 
   // Set up the interaction
-  m_imageStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
+  m_imageStyle = vtkSmartPointer<usInteractor2D>::New();
 
   m_interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
   m_interactor->SetInteractorStyle(m_imageStyle);
@@ -156,9 +156,11 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   m_callback->setSliceOrientation(m_orientation);
   m_callback->SetInteractor(m_interactor);
 
-  m_imageStyle->AddObserver(vtkCommand::MouseMoveEvent, m_callback);
-  m_imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, m_callback);
-  m_imageStyle->AddObserver(vtkCommand::LeftButtonReleaseEvent, m_callback);
+  //m_imageStyle->AddObserver(vtkCommand::MouseMoveEvent, m_callback);
+  //m_imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, m_callback);
+  //m_imageStyle->AddObserver(vtkCommand::LeftButtonReleaseEvent, m_callback);
+  m_imageStyle->AddObserver(vtkCommand::MouseWheelBackwardEvent, m_callback);
+  m_imageStyle->AddObserver(vtkCommand::MouseWheelForwardEvent, m_callback);
 }
 
 /**

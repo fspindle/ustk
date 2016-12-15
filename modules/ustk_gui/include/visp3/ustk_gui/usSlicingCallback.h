@@ -94,6 +94,64 @@ public:
     {
       this->Slicing = 0;
     }
+    else if (event == vtkCommand::MouseWheelForwardEvent) {
+        vtkImageReslice *reslice = this->ImageReslice;
+
+        reslice->Update();
+        double sliceSpacing;
+        if(m_orientation == us::Xorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[2];
+        }
+        else if(m_orientation == us::Yorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[1];
+        }
+        else if(m_orientation == us::Zorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[0];
+        }
+        vtkMatrix4x4 *matrix = reslice->GetResliceAxes();
+        // move the center point that we are slicing through
+        double point[4];
+        point[0] = 0.0;
+        point[1] = 0.0;
+        point[2] = sliceSpacing; //one frame forward
+        point[3] = 1.0;
+        double center[4];
+        matrix->MultiplyPoint(point, center);
+        //m_viewer3D->sliceX(center[2]);
+        matrix->SetElement(0, 3, center[0]);
+        matrix->SetElement(1, 3, center[1]);
+        matrix->SetElement(2, 3, center[2]);
+        interactor->Render();
+    }
+    else if (event == vtkCommand::MouseWheelBackwardEvent) {
+        vtkImageReslice *reslice = this->ImageReslice;
+
+        reslice->Update();
+        double sliceSpacing;
+        if(m_orientation == us::Xorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[2];
+        }
+        else if(m_orientation == us::Yorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[1];
+        }
+        else if(m_orientation == us::Zorientation) {
+          sliceSpacing = reslice->GetOutput()->GetSpacing()[0];
+        }
+        vtkMatrix4x4 *matrix = reslice->GetResliceAxes();
+        // move the center point that we are slicing through
+        double point[4];
+        point[0] = 0.0;
+        point[1] = 0.0;
+        point[2] = - sliceSpacing; //one frame backward
+        point[3] = 1.0;
+        double center[4];
+        matrix->MultiplyPoint(point, center);
+        //m_viewer3D->sliceX(center[2]);
+        matrix->SetElement(0, 3, center[0]);
+        matrix->SetElement(1, 3, center[1]);
+        matrix->SetElement(2, 3, center[2]);
+        interactor->Render();
+    }
     else if (event == vtkCommand::MouseMoveEvent)
     {
       if (this->Slicing)
