@@ -65,18 +65,31 @@ usViewer3D::usViewer3D()
   //Hard coded plane selection
   //planeWidget->SetSliceIndex(10);
 
-  m_image->SetOrigin(0,0,0);
+  int extent[6];
+  double spacing[3];
+  double origin[3];
+
+  reader->GetOutputInformation(0)->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent);
+  reader->GetOutput()->GetSpacing(spacing);
+  reader->GetOutput()->GetOrigin(origin);
+
+  double center[3];
+  center[0] = origin[0] + spacing[0] * 0.5 * (extent[0] + extent[1]);
+  center[1] = origin[1] + spacing[1] * 0.5 * (extent[2] + extent[3]);
+  center[2] = origin[2] + spacing[2] * 0.5 * (extent[4] + extent[5]);
+
+
 
 
   m_planeX = vtkSmartPointer<vtkPlane>::New();
   m_planeX->SetNormal(1,0,0);
-  m_planeX->SetOrigin(50,0,0);
+  m_planeX->SetOrigin(center[0],0,0);
   m_planeY = vtkSmartPointer<vtkPlane>::New();
   m_planeY->SetNormal(0,1,0);
-  m_planeY->SetOrigin(0,100,0);
+  m_planeY->SetOrigin(0,center[1],0);
   m_planeZ = vtkSmartPointer<vtkPlane>::New();
   m_planeZ->SetNormal(0,0,1);
-  m_planeZ->SetOrigin(0,0,50);
+  m_planeZ->SetOrigin(0,0,center[2]);
 
   //select plane
   m_imageResliceMapperX->SetSlicePlane(m_planeX);

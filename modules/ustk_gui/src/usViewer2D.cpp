@@ -72,6 +72,7 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1 };
+
   double YElements[16] = {
     1, 0, 0, 0,
     0, 0, 1, 0,
@@ -90,27 +91,24 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   //         0, 0.5, 0.866025, 0,
   //         0, 0, 0, 1 };
 
-  if(m_orientation == us::Xorientation) {
-    for(int i=0;i<16;i++)
-      elements[i] = XElements[i];
-  }
-  else if (m_orientation == us::Yorientation) {
-    for(int i=0;i<16;i++)
-      elements[i] = YElements[i];
-  }
-  else if (m_orientation == us::Zorientation) {
-    for(int i=0;i<16;i++)
-      elements[i] = ZElements[i];
-  }
+
 
 
   // Set the slice orientation
   m_resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
-  m_resliceAxes->DeepCopy(elements);
+  if(m_orientation == us::Xorientation) {
+    m_resliceAxes->DeepCopy(XElements);
+  }
+  else if (m_orientation == us::Yorientation) {
+    m_resliceAxes->DeepCopy(YElements);
+  }
+  else if (m_orientation == us::Zorientation) {
+    m_resliceAxes->DeepCopy(ZElements);
+  }
   // Set the point through which to slice
   m_resliceAxes->SetElement(0, 3, center[0]);
   m_resliceAxes->SetElement(1, 3, center[1]);
-  m_resliceAxes->SetElement(2, 3, sliceOrigin);
+  m_resliceAxes->SetElement(2, 3, center[2]);
 
   // Extract a slice in the desired orientation
   m_reslice = vtkSmartPointer<vtkImageReslice>::New();
@@ -136,8 +134,35 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   m_actor = vtkSmartPointer<vtkImageActor>::New();
   m_actor->GetMapper()->SetInputConnection(m_color->GetOutputPort());
 
+  //Text for slice number
+  m_sliceTextProp = vtkSmartPointer<vtkTextProperty>::New();
+  m_sliceTextProp->SetFontFamilyToCourier();
+  m_sliceTextProp->SetFontSize(20);
+  m_sliceTextProp->SetVerticalJustificationToBottom();
+  m_sliceTextProp->SetJustificationToLeft();
+
+  m_sliceTextMapper = vtkSmartPointer<vtkTextMapper>::New();
+  std::stringstream tmp;
+  if(m_orientation == us::Xorientation) {
+    tmp << "Slice :  " << center[2];
+  }
+  else if(m_orientation == us::Yorientation) {
+    tmp << "Slice :  " << center[1];
+  }
+  else if(m_orientation == us::Zorientation) {
+    tmp << "Slice :  " << center[0];
+  }
+  std::string msg = tmp.str();
+  m_sliceTextMapper->SetInput(msg.c_str());
+  m_sliceTextMapper->SetTextProperty(m_sliceTextProp);
+
+  m_sliceTextActor = vtkSmartPointer<vtkActor2D>::New();
+  m_sliceTextActor->SetMapper(m_sliceTextMapper);
+  m_sliceTextActor->SetPosition(15, 10);
+
   m_renderer = vtkSmartPointer<vtkRenderer>::New();
   m_renderer->AddActor(m_actor);
+  m_renderer->AddActor(m_sliceTextActor);
 
   m_window = vtkSmartPointer<vtkRenderWindow>::New();
   m_window->AddRenderer(m_renderer);
@@ -155,6 +180,7 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   m_callback->SetImageReslice(m_reslice);
   m_callback->setSliceOrientation(m_orientation);
   m_callback->SetInteractor(m_interactor);
+  m_callback->SetTextMapper(m_sliceTextMapper);
 
   //m_imageStyle->AddObserver(vtkCommand::MouseMoveEvent, m_callback);
   //m_imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, m_callback);
@@ -177,18 +203,7 @@ usViewer2D::~usViewer2D()
 void usViewer2D::start()
 {
   // Start interaction
-  // The Start() method doesn't return until the window is closed by the user
   m_interactor->Start();
-}
-
-/**
-* Init interactor.
-*/
-void usViewer2D::initInteractorStyle(usViewer3D* viewer)
-{
-  //m_interactorStyle->SetImageViewer(m_imageReslice,0,100,50);
-  //m_interactorStyle->SetViewer3D(viewer);
-  //m_interactorStyle->SetRenderWindow2D(m_window);
 }
 
 /**
@@ -196,21 +211,5 @@ void usViewer2D::initInteractorStyle(usViewer3D* viewer)
 */
 void usViewer2D::setOrientation(us::Orientation orientation)
 {
-  /*
-  std::cout << "setOrientation" << std::endl;
-  if(orientation == usViewer2D::Xorientation)
-    m_imageViewer->SetSliceOrientationToYZ();
-  else if(orientation == usViewer2D::Yorientation)
-    m_imageViewer->SetSliceOrientationToXZ();
-  else if(orientation == usViewer2D::Zorientation)
-    m_imageViewer->SetSliceOrientationToXY();
-  std::cout << "setOrientation end" << std::endl;
-  m_imageViewer->UpdateDisplayExtent();*/
-}
-
-/**
-* Set orientation of th view.
-*/
-void usViewer2D::updateView() {
-  //m_imageReslice->Update();
+  m_orientation = orientation;
 }
