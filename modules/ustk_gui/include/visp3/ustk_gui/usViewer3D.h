@@ -65,6 +65,8 @@
 #include <vtkLookupTable.h>
 #include <vtkImageMapToColors.h>
 #include <vtkImageActor.h>
+#include <vtkInformation.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 
 /**
  * @class usViewer3D

@@ -42,10 +42,8 @@ int main()
   usViewer3D viewer3D = usViewer3D();
 
   usViewer2D viewer2DX = usViewer2D(us::Xorientation,(int)*viewer3D.getXSliceOrigin());
-  usViewer2D viewer2DY = usViewer2D(us::Yorientation,(int)*viewer3D.getYSliceOrigin());
-  usViewer2D viewer2DZ = usViewer2D(us::Zorientation,(int)*viewer3D.getZSliceOrigin());
-
-  //viewer2DX.initInteractorStyle(&viewer3D);
+  usViewer2D viewer2DY = usViewer2D(us::Yorientation,(int)viewer3D.getYSliceOrigin()[1]);
+  usViewer2D viewer2DZ = usViewer2D(us::Zorientation,(int)viewer3D.getZSliceOrigin()[2]);
 
   viewer3D.start();
   viewer2DX.start();

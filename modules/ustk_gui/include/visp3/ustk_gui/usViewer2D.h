@@ -38,6 +38,7 @@
 #define US_VIEWER_2D_H
 
 #include <string>
+#include <cmath>
 
 //ViSP includes
 #include <visp3/ustk_core/usImageRF2D.h>
@@ -87,6 +88,7 @@
 #include <vtkImageMapToColors.h>
 #include <vtkImageActor.h>
 #include <vtkAbstractTransform.h>
+#include <vtkTextProperty.h>
 
 
 //UsTK includes
@@ -107,15 +109,12 @@ public:
 
   virtual ~usViewer2D();
 
-  void initInteractorStyle(usViewer3D* viewer);
-
   void setSize(int height, int width);
 
   void setOrientation(us::Orientation orientation);
 
   void start();
 
-  void updateView();
 
 private:
 
@@ -128,6 +127,12 @@ private:
   vtkSmartPointer<vtkImageMapToColors> m_color;
 
   vtkSmartPointer<vtkImageActor> m_actor;
+
+  vtkSmartPointer<vtkTextProperty> m_sliceTextProp;
+
+  vtkSmartPointer<vtkTextMapper> m_sliceTextMapper;
+
+  vtkSmartPointer<vtkActor2D> m_sliceTextActor;
 
   vtkSmartPointer<vtkRenderer> m_renderer;
 
