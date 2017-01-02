@@ -36,7 +36,11 @@
 
 int main()
 {
+#ifdef USTK_HAVE_VTK
   //usViewer2D viewer = usViewer2D();
   //viewer.start();
+#else
+  std::cout << "You should install vtk-6.0.0 or a more recent version to run this tutorial..." << std::endl;
+#endif
   return 0;
 }

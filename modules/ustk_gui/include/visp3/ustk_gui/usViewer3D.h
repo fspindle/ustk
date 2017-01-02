@@ -39,6 +39,10 @@
 
 #include <string>
 
+#include <visp3/ustk_gui/usGuiConfig.h>
+
+#ifdef USTK_HAVE_VTK
+
 #include <visp3/ustk_core/usImageRF2D.h>
 #include <visp3/ustk_core/usImageRF3D.h>
 #include <visp3/ustk_core/usImagePreScan2D.h>
@@ -135,4 +139,5 @@ private:
   int m_imageDims[3];
 };
 
+#endif
 #endif //US_VIEWER_3D_H

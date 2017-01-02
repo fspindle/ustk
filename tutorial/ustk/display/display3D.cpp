@@ -33,12 +33,15 @@
 #include <visp3/ustk_io/usImageIo.h>
 #include <visp3/ustk_gui/usViewer3D.h>
 #include <visp3/ustk_gui/usViewer2D.h>
-#include <vtkMatrix4x4.h>
-#include <vtkAbstractTransform.h>
+
+
+//#include <vtkMatrix4x4.h>
+//#include <vtkAbstractTransform.h>
 
 
 int main()
 {
+#ifdef USTK_HAVE_VTK
   usViewer3D viewer3D = usViewer3D();
 
   usViewer2D viewer2DX = usViewer2D(us::Xorientation,(int)*viewer3D.getXSliceOrigin());
@@ -49,6 +52,8 @@ int main()
   viewer2DX.start();
   viewer2DY.start();
   viewer2DZ.start();
-
+#else
+  std::cout << "You should install vtk-6.0.0 or a more recent version to run this tutorial..." << std::endl;
+#endif
   return 0;
 }

@@ -31,6 +31,8 @@
 
 #include <visp3/ustk_gui/usViewer3D.h>
 
+#ifdef USTK_HAVE_VTK
+
 /**
 * Default constructor.
 */
@@ -284,3 +286,19 @@ vtkPlane* usViewer3D::getZPlane()
 {
   return m_planeZ;
 }
+
+#else
+
+// Work arround to avoid visp_ustk_gui library empty when VTK is not installed or used
+class VISP_EXPORT dummy_usViewer3D
+{
+public:
+  dummy_usViewer3D() {};
+};
+
+#if !defined(VISP_BUILD_SHARED_LIBS)
+// Work arround to avoid warning: libvisp_ustk_gui.a(usViewer3D.cpp.o) has no symbols
+void dummy_usViewer3D_fct() {};
+#endif
+
+#endif

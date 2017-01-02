@@ -1,14 +1,17 @@
 #ifndef US_INTERACTOR_2D_H
 #define US_INTERACTOR_2D_H
 
+#include <visp3/ustk_gui/usGuiConfig.h>
+
+#ifdef USTK_HAVE_VTK
 
 //ViSP includes
-#include<visp3/core/vpConfig.h>
-#include<visp3/ustk_gui/usViewer2D.h>
-#include<visp3/ustk_gui/usViewer3D.h>
+#include <visp3/core/vpConfig.h>
+#include <visp3/ustk_gui/usViewer2D.h>
+#include <visp3/ustk_gui/usViewer3D.h>
 
 //VTK includes
-#include<vtkInteractorStyleImage.h>
+#include <vtkInteractorStyleImage.h>
 #include <vtkSmartPointer.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
@@ -134,4 +137,5 @@ protected:
 
 vtkStandardNewMacro(usInteractor2D);
 
+#endif
 #endif //US_INTERACTOR_2D_H

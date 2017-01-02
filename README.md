@@ -1,4 +1,4 @@
-### Ultrasound Tool Kit - UsTK
+### Ultrasound Toolkit - UsTK
 
 Copyright (C) 2016 by Inria.
 
@@ -6,8 +6,25 @@ Copyright (C) 2016 by Inria.
 
 #### Dependencies
 
-This UsTK project needs [ViSP](https://visp.inria.fr) as third-party.
-For compilation, UsTK is considered as a set of ViSP external modules. Thus ViSP and UsTK have to be compiled together. 
+- **visp source code**
+
+    This UsTK project needs [ViSP](https://visp.inria.fr) as third-party.
+For compilation, UsTK is considered as a set of ViSP external modules. Thus ViSP and UsTK source code have to be compiled together. 
+
+- **vtk package**
+
+    ustk_gui module requires at least vtk-6.0.0 or a more recent version.
+To install vtk:
+
+    - on ubuntu 14.04 or 16.04
+
+            $ sudo apt-get install libvtk6-dev
+            
+    - on OSX:
+
+            $ brew update
+            $ brew install homebrew/science/vtk
+            
 
 #### How to build UsTK libraries
 

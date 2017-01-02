@@ -31,10 +31,12 @@
 
 #include <visp3/ustk_gui/usViewer2D.h>
 
+#ifdef USTK_HAVE_VTK
+
 /**
 * Default constructor.
 */
-usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
+usViewer2D::usViewer2D(us::Orientation orientation, int sliceOrigin)
 {
   m_orientation = orientation;
 
@@ -207,3 +209,19 @@ void usViewer2D::setOrientation(us::Orientation orientation)
 {
   m_orientation = orientation;
 }
+
+#else
+
+// Work arround to avoid visp_ustk_gui library empty when VTK is not installed or used
+class VISP_EXPORT dummy_usViewer2D
+{
+public:
+  dummy_usViewer2D() {};
+};
+
+#if !defined(VISP_BUILD_SHARED_LIBS)
+// Work arround to avoid warning: libvisp_ustk_gui.a(usViewer2D.cpp.o) has no symbols
+void dummy_usViewer2D_fct() {};
+#endif
+
+#endif

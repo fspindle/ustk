@@ -1,16 +1,16 @@
 #ifndef US_SLICING_CALLBACK_H
 #define US_SLICING_CALLBACK_H
 
+#include <visp3/ustk_gui/usGuiConfig.h>
 
-//ViSP includes
-#include<visp3/core/vpConfig.h>
+#ifdef USTK_HAVE_VTK
 
 //UsTK includes
-#include<visp3/ustk_core/us.h>
-#include<visp3/ustk_gui/usViewer3D.h>
+#include <visp3/ustk_core/us.h>
+#include <visp3/ustk_gui/usViewer3D.h>
 
 //VTK includes
-#include<vtkInteractorStyleImage.h>
+#include <vtkInteractorStyleImage.h>
 #include <vtkSmartPointer.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
@@ -23,7 +23,6 @@
 #include <vtkActor2D.h>
 #include <vtkTextProperty.h>
 #include <vtkTextMapper.h>
-
 
 #include <vtkSmartPointer.h>
 #include <vtkImageReader2.h>
@@ -81,7 +80,10 @@ public:
     m_textMapper = textMapper;
   };
 
-  void Execute(vtkObject *, unsigned long event, void *) VTK_OVERRIDE
+  void Execute(vtkObject *, unsigned long event, void *)
+#if (USTK_HAVE_VTK_VERSION > 0x070100) // vtk-7.1.0
+  VTK_OVERRIDE
+#endif
   {
     vtkRenderWindowInteractor *interactor = this->GetInteractor();
 
@@ -252,4 +254,5 @@ private:
   vtkRenderWindowInteractor *Interactor;
 };
 
+#endif
 #endif //US_SLICING_CALLBACK_H

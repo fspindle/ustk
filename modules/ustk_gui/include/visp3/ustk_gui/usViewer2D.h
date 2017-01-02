@@ -37,6 +37,10 @@
 #ifndef US_VIEWER_2D_H
 #define US_VIEWER_2D_H
 
+#include <visp3/ustk_gui/usGuiConfig.h>
+
+#ifdef USTK_HAVE_VTK
+
 #include <string>
 #include <cmath>
 
@@ -151,4 +155,5 @@ private:
   us::Orientation m_orientation;
 };
 
+#endif
 #endif //US_VIEWER_2D_H
