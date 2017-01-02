@@ -64,45 +64,39 @@ usViewer2D::usViewer2D(us::Orientation orientation ,int sliceOrigin)
   center[1] = origin[1] + spacing[1] * 0.5 * (extent[2] + extent[3]);
   center[2] = origin[2] + spacing[2] * 0.5 * (extent[4] + extent[5]);
 
-  // Matrice for view orientations
-
-  double elements[16];
-  double XElements[16] = {
-    1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    0, 0, 0, 1 };
-
-  double YElements[16] = {
-    1, 0, 0, 0,
-    0, 0, 1, 0,
-    0,-1, 0, 0,
-    0, 0, 0, 1 };
-
-  double ZElements[16] = {
-    0, 0,-1, 0,
-    1, 0, 0, 0,
-    0,-1, 0, 0,
-    0, 0, 0, 1 };
-
   //static double obliqueElements[16] = {
   //         1, 0, 0, 0,
   //         0, 0.866025, -0.5, 0,
   //         0, 0.5, 0.866025, 0,
   //         0, 0, 0, 1 };
 
-
-
-
   // Set the slice orientation
   m_resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
   if(m_orientation == us::Xorientation) {
+    double XElements[16] = {
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1 };
+
     m_resliceAxes->DeepCopy(XElements);
   }
   else if (m_orientation == us::Yorientation) {
+    double YElements[16] = {
+      1, 0, 0, 0,
+      0, 0, 1, 0,
+      0,-1, 0, 0,
+      0, 0, 0, 1 };
+
     m_resliceAxes->DeepCopy(YElements);
   }
   else if (m_orientation == us::Zorientation) {
+    double ZElements[16] = {
+      0, 0,-1, 0,
+      1, 0, 0, 0,
+      0,-1, 0, 0,
+      0, 0, 0, 1 };
+
     m_resliceAxes->DeepCopy(ZElements);
   }
   // Set the point through which to slice
