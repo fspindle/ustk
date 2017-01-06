@@ -2,6 +2,8 @@
 #include <QtGui/QApplication>
 #include <visp3/ustk_gui/usMedicalImageViewer.h>
 
+#ifdef USTK_HAVE_VTK
+
 int main( int argc, char** argv )
 {
   // QT application
@@ -13,3 +15,10 @@ int main( int argc, char** argv )
 
   return app.exec();
 }
+#else
+int main( int argc, char** argv )
+{
+  std::cout << "You need VTK to run this example" << std::endl;
+  return EXIT_SUCCESS;
+}
+#endif

@@ -39,7 +39,9 @@
 #define US_MEDICAL_IMAGE_VIEWER
 
 //VISP includes
-#include <visp3/core/vpConfig.h>
+#include <visp3/ustk_gui/usGuiConfig.h>
+
+#ifdef USTK_HAVE_VTK
 
 //USTK includes
 
@@ -112,5 +114,5 @@ private:
     QPushButton *resetColorsButton;
     QPushButton *AddDistance1Button;
 };
-
+#endif
 #endif // US_MEDICAL_IMAGE_VIEWER

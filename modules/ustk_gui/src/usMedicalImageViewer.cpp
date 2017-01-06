@@ -36,6 +36,8 @@
 
 #include <visp3/ustk_gui/usMedicalImageViewer.h>
 
+#ifdef USTK_HAVE_VTK
+
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkResliceImageViewer.h>
@@ -64,6 +66,7 @@
 #include <vtkDistanceRepresentation2D.h>
 #include <vtkPointHandleRepresentation3D.h>
 #include <vtkPointHandleRepresentation2D.h>
+#include <vtkImageSliceMapper.h>
 
 #include <QDesktopWidget>
 #include <QResizeEvent>
@@ -471,3 +474,20 @@ void usMedicalImageViewer::resizeEvent(QResizeEvent* event)
     AddDistance1Button->setGeometry(QRect(event->size().width() - 180, 130, 160, 31));
   }
 }
+
+
+#else
+
+// Work arround to avoid visp_ustk_gui library empty when VTK is not installed or used
+class VISP_EXPORT dummy_usMedicalImageViewer
+{
+public:
+  dummy_usMedicalImageViewer() {};
+};
+
+#if !defined(VISP_BUILD_SHARED_LIBS)
+// Work arround to avoid warning: libvisp_ustk_gui.a(usViewer3D.cpp.o) has no symbols
+void dummy_usMedicalImageViewer_fct() {};
+#endif
+
+#endif
