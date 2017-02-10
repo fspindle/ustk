@@ -66,12 +66,14 @@
 #  include <QtGui/QGridLayout>
 #  include <QtGui/QPushButton>
 #  include <QtGui/QSlider>
+#  include <QtCore/QMutex>
 #elif defined(USTK_HAVE_VTK_QT5)
 #  include <QtWidgets/QApplication>
 #  include <QtWidgets/QMainWindow>
 #  include <QtWidgets/QGridLayout>
 #  include <QtWidgets/QPushButton>
 #  include <QtWidgets/QSlider>
+#  include <QtCore/QMutex>
 #endif
 
 /**
@@ -87,11 +89,17 @@ public:
 
   // Constructor/Destructor
   us3DSceneSlicing(std::string imageFileName);
+  us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame );
+
   ~us3DSceneSlicing() {}
 
   void resizeEvent(QResizeEvent* event);
 
+  QMutex * imageMutex;
+
 public slots:
+  void updateFrame(int frameIndex);
+
   void updateX(int x);
   void updateY(int y);
   void updateZ(int z);
@@ -135,6 +143,8 @@ private:
     //image
     usImagePostScan3D<unsigned char> postScanImage;
     vtkSmartPointer<vtkImageData> vtkImage;
+
+    usImagePreScan2D<unsigned char> * preScanFrame;
 };
 #endif
 #endif // __us3DSceneSlicing_h_

@@ -66,7 +66,7 @@ void usVTKConverter::convert(const usImagePostScan3D<unsigned char> &postScanIma
 }
 
 /**
-* Converts a vtkImageData to a usImagePostScan3D.
+* Converts a usImagePreScan3D to a vtkImageData.
 */
 void usVTKConverter::convert(const usImagePreScan3D<unsigned char> &preScanImage,vtkSmartPointer<vtkImageData> &vtkPreScanImage, vtkSmartPointer<vtkImageImport> importer)
 {
@@ -80,6 +80,27 @@ void usVTKConverter::convert(const usImagePreScan3D<unsigned char> &preScanImage
   }
   else
     importer->SetImportVoidPointer((void *)preScanImage.getConstData());
+
+  importer->Update();
+
+  vtkPreScanImage = importer->GetOutput();
+}
+
+/**
+* Converts a usImagePreScan2D to a vtkImageData.
+*/
+void usVTKConverter::convert(const usImagePreScan2D<unsigned char> * preScanImage,vtkSmartPointer<vtkImageData> &vtkPreScanImage, vtkSmartPointer<vtkImageImport> importer)
+{
+  if(importer==NULL) {
+    importer = vtkSmartPointer<vtkImageImport>::New();
+    importer->SetDataScalarTypeToUnsignedChar();
+    importer->SetImportVoidPointer((void *)preScanImage->bitmap);
+    importer->SetWholeExtent(0,preScanImage->getWidth()-1,0, preScanImage->getHeight()-1, 0, 0);
+    importer->SetDataExtentToWholeExtent();
+    importer->SetNumberOfScalarComponents(1);
+  }
+  else
+    importer->SetImportVoidPointer((void *)preScanImage->bitmap);
 
   importer->Update();
 

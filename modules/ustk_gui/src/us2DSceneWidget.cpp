@@ -170,6 +170,8 @@ void us2DSceneWidget::setResliceMatrix(vtkMatrix4x4 *matrix) {
 */
 void us2DSceneWidget::updateImageData(vtkImageData* imageData) {
   m_imageData = imageData;
+  m_reslice->SetInputData(m_imageData);
+  update();
 }
 
 /**

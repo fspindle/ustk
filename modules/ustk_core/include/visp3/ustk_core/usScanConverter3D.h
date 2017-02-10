@@ -87,7 +87,10 @@ public:
     usScanConverter3D(const usImagePreScan3D<unsigned char> &preScanImage, int down);
     virtual ~usScanConverter3D();
 
-    void init(const usImagePreScan3D<unsigned char> &preScanImage, int down = 1);
+    void convert(usImagePostScan3D<unsigned char> &postScanImage, const unsigned char *dataPreScan=NULL);
+
+    void convertPreScanCoordToPostScanCoord(double i, double j, double k, double *x=NULL, double *y=NULL, double *z=NULL, bool sweepInZdirection=true);
+    void convertPostScanCoordToPreScanCoord(double x, double y, double z, double *i=NULL, double *j=NULL, double *k=NULL, bool sweepInZdirection=true);
 
     double getResolution() const;
 
@@ -96,12 +99,11 @@ public:
 
     double getResolution() {return _resolution;}
 
+    void init(const usImagePreScan3D<unsigned char> &preScanImage, int down = 1);
+
     void SweepInZdirection(bool flag) {_SweepInZdirection = flag;}
 
-    void convert(usImagePostScan3D<unsigned char> &postScanImage, const unsigned char *dataPreScan=NULL);
-
-    void convertPreScanCoordToPostScanCoord(double i, double j, double k, double *x=NULL, double *y=NULL, double *z=NULL, bool sweepInZdirection=true);
-    void convertPostScanCoordToPreScanCoord(double x, double y, double z, double *i=NULL, double *j=NULL, double *k=NULL, bool sweepInZdirection=true);
+    void updatePreScanImage(const usImagePreScan3D<unsigned char> &preScanImage);
 };
 
 #endif // US_SCAN_CONVERTER_3D_H

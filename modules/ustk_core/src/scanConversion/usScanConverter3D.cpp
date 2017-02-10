@@ -215,6 +215,15 @@ usImagePostScan3D<unsigned char> usScanConverter3D::getVolume()
 }
 
 /**
+ * Update pre-scan image.
+ * @param New pre-scan image to convert.
+ */
+void usScanConverter3D::updatePreScanImage(const usImagePreScan3D<unsigned char> &preScanImage)
+{
+  _VpreScan = preScanImage;
+}
+
+/**
  * Conversion method : compute the scan-conversion 3D and write the post-scan image settings.
  * @param [out] postScanImage The result of the scan-conversion.
  * @param dataPreScan

@@ -135,6 +135,59 @@ us3DSceneSlicing::us3DSceneSlicing(std::string imageFileName )
 }
 
 /**
+* Constructor.
+* @param frame the frame to display.
+*/
+us3DSceneSlicing::us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame )
+{
+  this->setupUi();
+  imageMutex->lock();
+  preScanFrame = frame;
+  usVTKConverter::convert(preScanFrame,vtkImage);
+  imageMutex->unlock();
+
+  int imageDims[3];
+  double spacing[3];
+  vtkImage->GetDimensions(imageDims);
+  vtkImage->GetSpacing(spacing);
+
+  plane1 = vtkPlane::New();
+  plane1->SetOrigin(imageDims[0]*spacing[0]/2,0,0);
+  plane1->SetNormal(1,0,0);
+
+  plane2 = vtkPlane::New();
+  plane2->SetNormal(0,1,0);
+  plane2->SetOrigin(0,imageDims[1]*spacing[1]/2,0);
+
+  plane3 = vtkPlane::New();
+  plane3->SetNormal(0,0,1);
+  plane3->SetOrigin(0,0,imageDims[2]*spacing[2]/2);
+
+  this->view->setImageData(vtkImage);
+  this->view->setPlanes(plane1,plane2,plane3);
+  this->view->init();
+
+  sliderXplane1->setMaximum(imageDims[0]*spacing[0]*1000);
+  sliderXplane1->setSliderPosition(imageDims[0]*spacing[0]*1000/2);
+  sliderYplane1->setMaximum(imageDims[1]*spacing[1]*1000);
+  sliderYplane1->setSliderPosition(imageDims[1]*spacing[1]*1000/2);
+  sliderZplane1->setMaximum(imageDims[2]*spacing[2]*1000);
+  sliderZplane1->setSliderPosition(imageDims[2]*spacing[2]*1000/2);
+
+
+  // Set up action signals and slots
+  connect(this->sliderXplane1, SIGNAL(valueChanged(int)), this, SLOT(updateX(int)));
+  connect(this->sliderYplane1, SIGNAL(valueChanged(int)), this, SLOT(updateY(int)));
+  connect(this->sliderZplane1, SIGNAL(valueChanged(int)), this, SLOT(updateZ(int)));
+
+  connect(this->rotXplane1, SIGNAL(valueChanged(int)), this, SLOT(updateRotX(int)));
+  connect(this->rotYplane1, SIGNAL(valueChanged(int)), this, SLOT(updateRotY(int)));
+  connect(this->rotZplane1, SIGNAL(valueChanged(int)), this, SLOT(updateRotZ(int)));
+
+  ResetViews();
+}
+
+/**
 * Exit slot, to exit the QApplication.
 */
 void us3DSceneSlicing::slotExit()
@@ -301,6 +354,18 @@ void us3DSceneSlicing::updateRotZ(int z) {
   double origin[3];
   plane1->GetOrigin(origin);
   view->update();
+}
+
+/**
+* Update displayed frame.
+*/
+void us3DSceneSlicing::updateFrame(int frameIndex) {
+
+  std::cout << "update frame. current index = " << frameIndex << std::endl;
+  imageMutex->lock();
+  usVTKConverter::convert(preScanFrame,vtkImage);
+  view->update();
+  imageMutex->unlock();
 }
 
 #endif
