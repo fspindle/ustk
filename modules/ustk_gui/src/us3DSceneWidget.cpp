@@ -306,6 +306,9 @@ void us3DSceneWidget::setPlanes(vtkPlane* plane1,vtkPlane* plane2,vtkPlane* plan
 */
 void us3DSceneWidget::updateImageData(vtkImageData* imageData) {
   this->imageData = imageData;
+  imageResliceMapper1->SetInputData(this->imageData);
+  imageResliceMapper2->SetInputData(this->imageData);
+  imageResliceMapper3->SetInputData(this->imageData);
   this->update();
 }
 

@@ -84,7 +84,7 @@
 #include <QResizeEvent>
 
 /**
-* Constructor.
+* Constructor to display an image on the disk.
 * @param imageFileName the mhd file to read.
 */
 usResliceMatrixViewer::usResliceMatrixViewer(std::string imageFileName )
@@ -92,6 +92,96 @@ usResliceMatrixViewer::usResliceMatrixViewer(std::string imageFileName )
   this->setupUi();
   usImageIo::read(postScanImage,imageFileName);
   usVTKConverter::convert(postScanImage,vtkImage);
+
+  int imageDims[3];
+  double spacing[3];
+  vtkImage->GetDimensions(imageDims);
+  vtkImage->GetSpacing(spacing);
+
+  //matrix representing plane 3
+  vpHomogeneousMatrix matrix3;
+  matrix3.eye();
+  matrix3[0][3] = imageDims[0]*spacing[0]/2;
+  matrix3[1][3] = imageDims[1]*spacing[1]/2;
+  matrix3[2][3] = imageDims[2]*spacing[2]/2;
+  matrix3[0][0] = 1;
+  matrix3[1][1] = -1;
+  matrix3[2][2] = -1;
+  vtkMatrix3 = vtkMatrix4x4::New();
+  usVTKConverter::convert(matrix3,vtkMatrix3);
+
+  //matrix representing plane 2
+  vpHomogeneousMatrix matrix2;
+  matrix2.eye();
+  matrix2[0][3] = imageDims[0]*spacing[0]/2;
+  matrix2[1][3] = imageDims[1]*spacing[1]/2;
+  matrix2[2][3] = imageDims[2]*spacing[2]/2;
+  matrix2[0][0] = 1;
+  matrix2[2][1] = 1;
+  matrix2[1][1] = 0;
+  matrix2[1][2] = -1;
+  matrix2[2][2] = 0;
+
+  vtkMatrix2 = vtkMatrix4x4::New();
+  usVTKConverter::convert(matrix2,vtkMatrix2);
+
+  //matrix representing plane 1
+  vpHomogeneousMatrix matrix1;
+  matrix1.eye();
+  matrix1[0][3] = imageDims[0]*spacing[0]/2;
+  matrix1[1][3] = imageDims[1]*spacing[1]/2;
+  matrix1[2][3] = imageDims[2]*spacing[2]/2;
+  matrix1[0][0] = 0;
+  matrix1[0][2] = 1;
+  matrix1[1][1] = -1;
+  matrix1[2][0] = 1;
+  matrix1[2][2] = 0;
+  vtkMatrix1 = vtkMatrix4x4::New();
+  usVTKConverter::convert(matrix1,vtkMatrix1);
+
+  view1->setImageData(vtkImage);
+  view1->setResliceMatrix(vtkMatrix1);
+  view1->init();
+  view1->setColor(1.0,0,0);
+
+  view4->setImageData(vtkImage);
+  view4->setResliceMatrix(vtkMatrix2);
+  view4->init();
+  view4->setColor(0,1.0,0);
+
+  view3->setImageData(vtkImage);
+  view3->setResliceMatrix(vtkMatrix3);
+  view3->init();
+  view3->setColor(0,0,1.0);
+
+  view2->setImageData(vtkImage);
+  view2->updateMatrix1(vtkMatrix1);
+  view2->updateMatrix2(vtkMatrix2);
+  view2->updateMatrix3(vtkMatrix3);
+  view2->init();
+
+  // Set up action signals and slots
+  connect(this->resetButton, SIGNAL(pressed()), this, SLOT(ResetViews()));
+  connect(this->saveView1Button, SIGNAL(pressed()), view1, SLOT(saveViewSlot()));
+  connect(this->saveView4Button, SIGNAL(pressed()), view4, SLOT(saveViewSlot()));
+  connect(this->saveView3Button, SIGNAL(pressed()), view3, SLOT(saveViewSlot()));
+
+  connect(view1,SIGNAL(matrixChanged(vtkMatrix4x4*)),view2,SLOT(updateMatrix1(vtkMatrix4x4*)));
+  connect(view4,SIGNAL(matrixChanged(vtkMatrix4x4*)),view2,SLOT(updateMatrix2(vtkMatrix4x4*)));
+  connect(view3,SIGNAL(matrixChanged(vtkMatrix4x4*)),view2,SLOT(updateMatrix3(vtkMatrix4x4*)));
+
+  ResetViews();
+}
+
+/**
+* Constructor to display any vtkImageData.
+* @param image Pointer on a vtkImageData.
+*/
+usResliceMatrixViewer::usResliceMatrixViewer(vtkSmartPointer<vtkImageData> image)
+{
+  this->setupUi();
+
+  vtkImage = image;
 
   int imageDims[3];
   double spacing[3];
@@ -326,4 +416,16 @@ void usResliceMatrixViewer::resizeEvent(QResizeEvent* event)
     saveView3Button->setGeometry(QRect(event->size().width() - 180, 180, 160, 31));
   }
 }
+
+/**
+* Update the displayed image.
+*/
+void usResliceMatrixViewer::updateImage(vtkImageData* image) {
+  vtkImage = image;
+  view1->updateImageData(vtkImage);
+  view2->updateImageData(vtkImage);
+  view3->updateImageData(vtkImage);
+  view4->updateImageData(vtkImage);
+}
+
 #endif

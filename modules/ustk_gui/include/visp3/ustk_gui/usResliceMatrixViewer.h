@@ -86,6 +86,7 @@ public:
 
   // Constructor/Destructor
   usResliceMatrixViewer(std::string imageFileName);
+  usResliceMatrixViewer(vtkSmartPointer<vtkImageData> image);
   ~usResliceMatrixViewer() {}
 
   void resizeEvent(QResizeEvent* event);
@@ -95,6 +96,8 @@ public slots:
   virtual void ResetViews();
   virtual void Render();
   virtual void slotExit();
+
+  void updateImage(vtkImageData* image);
 
 private:
     void setupUi();
