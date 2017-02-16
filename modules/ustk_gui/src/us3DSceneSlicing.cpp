@@ -138,13 +138,22 @@ us3DSceneSlicing::us3DSceneSlicing(std::string imageFileName )
 * Constructor.
 * @param frame the frame to display.
 */
-us3DSceneSlicing::us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame )
+us3DSceneSlicing::us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame , QMutex *m)
 {
   this->setupUi();
+  imageMutex = m;
+
+  std::cout << "A" << std::endl;
   imageMutex->lock();
+
+  std::cout << "A" << std::endl;
   preScanFrame = frame;
+
+  std::cout << "A" << std::endl;
   usVTKConverter::convert(preScanFrame,vtkImage);
+  std::cout << "A" << std::endl;
   imageMutex->unlock();
+  std::cout << "A" << std::endl;
 
   int imageDims[3];
   double spacing[3];

@@ -89,7 +89,7 @@ public:
 
   // Constructor/Destructor
   us3DSceneSlicing(std::string imageFileName);
-  us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame );
+  us3DSceneSlicing(usImagePreScan2D<unsigned char>* frame, QMutex * m );
 
   ~us3DSceneSlicing() {}
 

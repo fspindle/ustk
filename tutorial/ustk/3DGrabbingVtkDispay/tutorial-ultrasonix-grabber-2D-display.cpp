@@ -6,6 +6,8 @@
 
 #if defined(VISP_HAVE_V4L2) && defined(VISP_HAVE_PTHREAD) && defined(USTK_HAVE_VTK_QT)
 
+#include <QtCore>
+
 #include <visp3/ustk_core/usImagePreScan2D.h>
 #include <visp3/ustk_core/usScanConverter3D.h>
 
@@ -14,7 +16,7 @@
 
 #include <visp3/ustk_grabber_volume/usGrabberThreadPreScan2D.h>
 
-#include <visp3/ustk_gui/usResliceMatrixViewer.h>
+#include <visp3/ustk_gui/us3DSceneSlicing.h>
 
 
 int main(int argc, char** argv)
@@ -28,14 +30,28 @@ int main(int argc, char** argv)
   usImagePreScan2D<unsigned char> frame;
   QMutex frameMutex;
 
+  std::cout << "1" << std::endl;
+  us3DSceneSlicing viewer(&frame, &frameMutex);
+
+  std::cout << "1" << std::endl;
+
+  std::cout << "1" << std::endl;
+  viewer.show();
+
+  std::cout << "1" << std::endl;
+
+
   //Start capture thread
   usGrabberThreadPreScan2D grabberThread2D(&frame, &frameMutex);
   grabberThread2D.start();
 
 
+  std::cout << "2" << std::endl;
 
   //connect grabber signal to viewer slot
+  QObject::connect(&grabberThread2D,SIGNAL(newFrameGrabbed(int)),&viewer,SLOT(updateFrame(int)));
 
+  std::cout << "3" << std::endl;
 
 
 
