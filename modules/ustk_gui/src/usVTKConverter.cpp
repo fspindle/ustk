@@ -87,6 +87,27 @@ void usVTKConverter::convert(const usImagePreScan3D<unsigned char> &preScanImage
 }
 
 /**
+* Converts a usImagePreScan3D to a vtkImageData.
+*/
+void usVTKConverter::convert(const usImagePostScan3D<unsigned int> &preScanImage,vtkSmartPointer<vtkImageData> &vtkPreScanImage, vtkSmartPointer<vtkImageImport> importer)
+{
+  if(importer==NULL) {
+    importer = vtkSmartPointer<vtkImageImport>::New();
+    importer->SetDataScalarTypeToInt();
+    importer->SetImportVoidPointer((void *)preScanImage.getConstData());
+    importer->SetWholeExtent(0,preScanImage.getDimX()-1,0, preScanImage.getDimY()-1, 0, preScanImage.getDimZ()-1);
+    importer->SetDataExtentToWholeExtent();
+    importer->SetNumberOfScalarComponents(1);
+  }
+  else
+    importer->SetImportVoidPointer((void *)preScanImage.getConstData());
+
+  importer->Update();
+
+  vtkPreScanImage = importer->GetOutput();
+}
+
+/**
 * Converts a vtkImageData to a usImagePostScan2D. Usefull to extract a slice from a volume. Performs a deep copy.
 */
 void usVTKConverter::convert(vtkSmartPointer<vtkImageData> &vtkPostScanImage, usImagePostScan2D<unsigned char> &postScanImage)

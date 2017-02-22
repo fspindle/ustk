@@ -75,7 +75,7 @@ namespace usNeedleDetectionTools
 /**
    * Compute the principal angle between two vectors.
    */
-double angle(double *p1, double *p2, double *q1, double *q2);
+VISP_EXPORT double angle(double *p1, double *p2, double *q1, double *q2);
 
 /**
    * Approximate curvilinear coordinates.
@@ -104,7 +104,7 @@ double angle(double *p1, double *p2, double *q1, double *q2);
    * \right]
    * \f]
    */
-vpMatrix approximateCoordinates(vpMatrix X, vpMatrix MSS, unsigned int s);
+VISP_EXPORT vpMatrix approximateCoordinates(vpMatrix X, vpMatrix MSS, unsigned int s);
 
 /**
    * Compute the mean (center of mass) of a set of d-dimensional points.
@@ -113,39 +113,39 @@ vpMatrix approximateCoordinates(vpMatrix X, vpMatrix MSS, unsigned int s);
    * @param npts Number of points.
    * @param d Dimension.
    */
-void arithmeticMean(const vpMatrix points, double *mean, unsigned int npts,
+VISP_EXPORT void arithmeticMean(const vpMatrix points, double *mean, unsigned int npts,
                     unsigned int d);
 
 
-void computeQuantile(unsigned char *data, unsigned int dataSize,
+VISP_EXPORT void computeQuantile(unsigned char *data, unsigned int dataSize,
                      unsigned int nDesired, unsigned int &q,
                      unsigned int &nThresholded);
-void computeQuantile(short *data, unsigned int dataSize,
+VISP_EXPORT void computeQuantile(short *data, unsigned int dataSize,
                      unsigned int nDesired, unsigned int &q,
                      unsigned int &nThresholded);
-void computeQuantile(const unsigned int *data, unsigned int dataSize,
+VISP_EXPORT void computeQuantile(const unsigned int *data, unsigned int dataSize,
                      unsigned int nDesired, unsigned int &q,
                      unsigned int &nThresholded);
 
-void computeControlPoints(const vpMatrix &model, vpMatrix &mss, double **points,
+VISP_EXPORT void computeControlPoints(const vpMatrix &model, vpMatrix &mss, double **points,
                           const unsigned int &nPoints);
 
 /**
    * Compute the euclidean distance between two 3D points.
    */
-double dist3(double *x, double *y);
+VISP_EXPORT double dist3(double *x, double *y);
 
 
-bool findEntry(const vpMatrix &model, double *entry, unsigned int nPoints,
+VISP_EXPORT bool findEntry(const vpMatrix &model, double *entry, unsigned int nPoints,
                const vpColVector &origin, const vpColVector &entryPlane, int VOI[6]);
 
 #if defined USTK_HAVE_VTK_QT
-int findTip(vtkDataArray *data, unsigned int dataSize, double gap);
-bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap);
-bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
-unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU);
-unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU, int prediction);
-bool findTipUsingMeanValues(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
+VISP_EXPORT int findTip(vtkDataArray *data, unsigned int dataSize, double gap);
+VISP_EXPORT bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap);
+VISP_EXPORT bool findTip(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
+VISP_EXPORT unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU);
+VISP_EXPORT unsigned int findTip(vtkDataArray *data, unsigned int dataSize, double threshL, double threshU, int prediction);
+VISP_EXPORT bool findTipUsingMeanValues(vtkImageData *image, const vpMatrix &model, int *VOI, double *tip, unsigned int nPoints, double gap, double length);
 #endif
 
 /**
@@ -154,7 +154,7 @@ bool findTipUsingMeanValues(vtkImageData *image, const vpMatrix &model, int *VOI
    * @param npts Number of points.
    * @param d Dimension.
    */
-vpColVector geometricMedian(const vpMatrix points, unsigned int npts,
+VISP_EXPORT vpColVector geometricMedian(const vpMatrix points, unsigned int npts,
                             unsigned int d);
 #if defined USTK_HAVE_VTK_QT
 /**
@@ -166,7 +166,7 @@ vpColVector geometricMedian(const vpMatrix points, unsigned int npts,
    *
    * @return The threshold.
    */
-void getThresholdedCoordinates(vtkImageData *image, vpMatrix &points, double threshold);
+VISP_EXPORT void getThresholdedCoordinates(vtkImageData *image, vpMatrix &points, double threshold);
 #endif
 
 #if 0
@@ -179,7 +179,7 @@ void getThresholdedCoordinates(vtkImageData *image, vpMatrix &points, double thr
    *
    * @return The threshold.
    */
-double getThresholdedCoordinates(const usVolume<unsigned int> &V,
+VISP_EXPORT double getThresholdedCoordinates(const usVolume<unsigned int> &V,
                                  vpMatrix &points,
                                  unsigned int nDesired);
 #endif
@@ -193,39 +193,39 @@ double getThresholdedCoordinates(const usVolume<unsigned int> &V,
    *
    * @return The threshold.
    */
-double getThresholdedCoordinates(vtkImageData *image,
+VISP_EXPORT double getThresholdedCoordinates(vtkImageData *image,
                                  vpMatrix &points,
                                  unsigned int nDesired);
 #endif
 #if defined USTK_HAVE_VTK_QT
-vpList<double*> getThresholdedIds(vtkImageData *image, double threshold);
+VISP_EXPORT  vpList<double*> getThresholdedIds(vtkImageData *image, double threshold);
 #endif
 
-bool inside(const vpColVector point, int *VOI);
+VISP_EXPORT bool inside(const vpColVector point, int *VOI);
 
 /**
    * Get the intersection between a plane and a straight line.
    */
-bool intersectionLinePlane(vpMatrix line, const vpColVector &plane, double offset,
+VISP_EXPORT bool intersectionLinePlane(vpMatrix line, const vpColVector &plane, double offset,
                            double &x, double &y, double &z);
 
 /**
    * Performs linear regression on a set of 3D points.
    */
-void linearRegression(vpMatrix &points, double &x, double &y, double &z,
+VISP_EXPORT void linearRegression(vpMatrix &points, double &x, double &y, double &z,
                       double &u, double &v, double &w);
-void linearRegression(vpMatrix &points, double &a, double &b, double &u, double &v, double &w);
+VISP_EXPORT void linearRegression(vpMatrix &points, double &a, double &b, double &u, double &v, double &w);
 
-short quantile(short *data, unsigned int num, unsigned int n);
+VISP_EXPORT short quantile(short *data, unsigned int num, unsigned int n);
 
 #if defined USTK_HAVE_VTK_QT
-short quantile(vtkDataSet *data, unsigned int num);
+VISP_EXPORT short quantile(vtkDataSet *data, unsigned int num);
 #endif
 
 /**
    * Compute the variance of a set of d-dimensional points.
    */
-double variance(vpMatrix points, unsigned int npts, unsigned int d);
+VISP_EXPORT double variance(vpMatrix points, unsigned int npts, unsigned int d);
 
 }
 
