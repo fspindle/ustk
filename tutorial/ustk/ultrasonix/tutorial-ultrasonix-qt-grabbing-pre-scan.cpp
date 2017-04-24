@@ -11,6 +11,7 @@
 #include <visp3/ustk_grabber/usNetworkGrabberPreScan.h>
 
 #include <visp3/gui/vpDisplayX.h>
+#include <visp3/gui/vpPlot.h>
 
 int main(int argc, char** argv)
 {
@@ -44,7 +45,6 @@ int main(int argc, char** argv)
 
   //prepare image;
   usDataGrabbed<usImagePreScan2D<unsigned char> >* grabbedFrame;
-  usDataGrabbed<usImagePreScan2D<unsigned char> > localFrame;
 
   //Prepare display
   vpDisplayX * displayX = NULL;
@@ -61,28 +61,33 @@ int main(int argc, char** argv)
   grabbingThread->start();
 
   std::cout << "waiting ultrasound initialisation..." << std::endl;
-
+  vpPlot plot(1);
+  plot.initGraph(0, 1);
+  plot.setTitle(0, "time measure");
+  plot.setUnitY(0, "datarate");
+  plot.setLegend(0, 0, "frame number");
   //our local grabbing loop
   do {
     if(qtGrabber->isFirstFrameAvailable()) {
       grabbedFrame = qtGrabber->acquire();
+      std::cout <<"MAIN THREAD received frame No : " << grabbedFrame->getFrameCount() << std::endl;
+      std::cout <<"DataRate : " << grabbedFrame->getDataRate() << std::endl;
+      if(grabbedFrame->getDataRate() != std::numeric_limits<double>::infinity())
+        plot.plot(0,0,(int)grabbedFrame->getFrameCount(),grabbedFrame->getDataRate());
+      else
+        plot.plot(0,0,(int)grabbedFrame->getFrameCount(),100);
 
-      //local copy for vpDisplay
-      localFrame = *grabbedFrame;
-
-      std::cout <<"MAIN THREAD received frame No : " << localFrame.getFrameCount() << std::endl;
 
       //init display
-      if(!displayInit && localFrame.getHeight() !=0 && localFrame.getHeight() !=0) {
-        displayX = new vpDisplayX(localFrame);
+      if(!displayInit && grabbedFrame->getHeight() !=0 && grabbedFrame->getHeight() !=0) {
+        displayX = new vpDisplayX(*grabbedFrame);
         displayInit = true;
       }
 
       // processing display
       if(displayInit) {
-        vpDisplay::display(localFrame);
-        vpDisplay::flush(localFrame);
-        //vpTime::wait(10); // wait to simulate a local process running on last frame grabbed
+        vpDisplay::display(*grabbedFrame);
+        vpDisplay::flush(*grabbedFrame);
       }
     }
     else {

@@ -156,6 +156,7 @@ void usNetworkGrabberPreScan::dataArrived()
     m_grabbedImage.setFrameCount(m_imageHeader.frameCount);
     m_grabbedImage.setFramesPerVolume(m_imageHeader.framesPerVolume);
     m_grabbedImage.setTimeStamp(m_imageHeader.timeStamp);
+    m_grabbedImage.setDataRate(m_imageHeader.dataRate);
 
     m_grabbedImage.resize(m_imageHeader.frameWidth,m_imageHeader.frameHeight);
 
@@ -195,6 +196,7 @@ void usNetworkGrabberPreScan::invertRowsCols() {
   m_outputBuffer.at(CURRENT_FILLED_FRAME_POSITION_IN_VEC)->setFrameCount(m_grabbedImage.getFrameCount());
   m_outputBuffer.at(CURRENT_FILLED_FRAME_POSITION_IN_VEC)->setFramesPerVolume(m_grabbedImage.getFramesPerVolume());
   m_outputBuffer.at(CURRENT_FILLED_FRAME_POSITION_IN_VEC)->setTimeStamp(m_grabbedImage.getTimeStamp());
+  m_outputBuffer.at(CURRENT_FILLED_FRAME_POSITION_IN_VEC)->setDataRate(m_grabbedImage.getDataRate());
 
   m_outputBuffer.at(CURRENT_FILLED_FRAME_POSITION_IN_VEC)->resize(m_grabbedImage.getWidth(),m_grabbedImage.getHeight());
 

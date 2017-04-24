@@ -61,10 +61,12 @@ public:
   explicit usDataGrabbed();
   ~usDataGrabbed();
 
+  double getDataRate() const;
   quint32 getFrameCount() const;
   int getFramesPerVolume() const;
   quint64 getTimeStamp() const;
 
+  void setDataRate(double dataRate);
   void setFrameCount(quint32 frameCount);
   void setFramesPerVolume(int framesPerVolume);
   void setTimeStamp(quint64 timeStamp);
@@ -75,6 +77,7 @@ private:
   quint32 m_frameCount; //from the beginning of acquisition
   quint64 m_timeStamp; //msecs since epoch (on ultrasond machine)
   int m_framesPerVolume; //number of frames in a volume (for 3D case)
+  double m_dataRate;
 };
 
 /**
@@ -150,6 +153,24 @@ void usDataGrabbed<Type>::setTimeStamp(quint64 timeStamp){
   m_timeStamp = timeStamp;
 }
 
+/**
+* Data rate getter.
+* @return dataRate The data rate of ultrasound station between the 2 last frames.
+*/
+template<class Type>
+double usDataGrabbed<Type>::getDataRate() const {
+  return m_dataRate;
+}
+
+/**
+* Data rate setter.
+* @param dataRate The data rate of ultrasound station between the 2 last frames.
+*/
+template<class Type>
+void usDataGrabbed<Type>::setDataRate(double dataRate) {
+  m_dataRate = dataRate;
+}
+
 /*!
   Print data grabbed information in a ostream.
   Usage example:
@@ -168,6 +189,7 @@ VISP_EXPORT std::ostream& operator<<(std::ostream& out, const usDataGrabbed<Type
 
   return out;
 }
+
 
 #endif // QT4 || QT5
 #endif // __usDataGrabbed_h_
