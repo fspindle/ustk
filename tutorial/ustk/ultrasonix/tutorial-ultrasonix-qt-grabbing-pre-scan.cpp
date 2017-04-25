@@ -7,6 +7,7 @@
 
 #include <QThread>
 #include <QApplication>
+#include <QFile>
 
 #include <visp3/ustk_grabber/usNetworkGrabberPreScan.h>
 
@@ -52,6 +53,18 @@ int main(int argc, char** argv)
 
   bool captureRunning = true;
 
+  // debug file opening
+  QFile client("timeMeasureClient.txt");
+  if (!client.open(QIODevice::WriteOnly | QIODevice::Text))
+      throw(vpException(vpException::fatalError,"cannot open file"));
+  QFile server("timeMeasureServer.txt");
+  if (!server.open(QIODevice::WriteOnly | QIODevice::Text))
+      throw(vpException(vpException::fatalError,"cannot open file"));
+
+  QTextStream clientStream(&client);
+  QTextStream serverStream(&server);
+
+
   //qtGrabber->setVerbose(true);
   // sending acquisition parameters
   qtGrabber->initAcquisition(header);
@@ -61,15 +74,44 @@ int main(int argc, char** argv)
   grabbingThread->start();
 
   std::cout << "waiting ultrasound initialisation..." << std::endl;
-  vpPlot plot(1);
+  vpPlot plot(2);
   plot.initGraph(0, 1);
-  plot.setTitle(0, "time measure");
-  plot.setUnitY(0, "datarate");
+  plot.setTitle(0, "dataRate server");
+  plot.setUnitY(0, "server dataRate");
   plot.setLegend(0, 0, "frame number");
+
+  plot.initGraph(1, 1);
+  plot.setTitle(1, "loopRate client");
+  plot.setUnitY(1, "client dataRate");
+  plot.setLegend(1, 0, "frame number");
+  double loopTime = vpTime::measureTimeMs();
+  quint64 frameTime = vpTime::measureTimeMs();
   //our local grabbing loop
   do {
     if(qtGrabber->isFirstFrameAvailable()) {
       grabbedFrame = qtGrabber->acquire();
+
+      //client time
+      double newLoopTime = vpTime::measureTimeMs();
+      double deltaTclient = newLoopTime - loopTime;
+      loopTime = newLoopTime;
+
+      //server time
+      double deltaTServer = (grabbedFrame->getTimeStamp() - frameTime);
+      frameTime = grabbedFrame->getTimeStamp();
+
+
+      if(grabbedFrame->getFrameCount()>10) { // to avoid init issues
+        //plot
+        plot.plot(0,0,grabbedFrame->getFrameCount(),deltaTServer);
+        plot.plot(1,0,grabbedFrame->getFrameCount(),deltaTclient);
+        //write in file
+        clientStream << grabbedFrame->getFrameCount() << "\t" << deltaTclient << endl;
+        serverStream << grabbedFrame->getFrameCount() << "\t" << deltaTServer << endl;
+
+      }
+
+
       std::cout <<"MAIN THREAD received frame No : " << grabbedFrame->getFrameCount() << std::endl;
       std::cout <<"DataRate : " << grabbedFrame->getDataRate() << std::endl;
       if(grabbedFrame->getDataRate() != std::numeric_limits<double>::infinity())
@@ -77,7 +119,7 @@ int main(int argc, char** argv)
       else
         plot.plot(0,0,(int)grabbedFrame->getFrameCount(),100);
 
-
+/*
       //init display
       if(!displayInit && grabbedFrame->getHeight() !=0 && grabbedFrame->getHeight() !=0) {
         displayX = new vpDisplayX(*grabbedFrame);
@@ -88,7 +130,7 @@ int main(int argc, char** argv)
       if(displayInit) {
         vpDisplay::display(*grabbedFrame);
         vpDisplay::flush(*grabbedFrame);
-      }
+      }*/
     }
     else {
       vpTime::wait(10);
