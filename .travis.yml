@@ -18,6 +18,7 @@ dist: trusty
 branches:
   only:
   - master
+  - test_travis
 
 before_install:
   - cd ${TRAVIS_BUILD_DIR} && { curl -O http://visp-doc.inria.fr/download/dataset/ViSP-images-3.0.0.zip ; cd -; }
@@ -49,6 +50,10 @@ before_script:
 
 script: 
   - make
+  - pwd
+  - ls -la
+  - ls modules/core/Release
+  - ./modules/core/Release/testMatrixPseudoInverse
   - ctest
 
 notifications:
