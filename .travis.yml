@@ -53,7 +53,7 @@ script:
   - pwd
   - ls modules/core
   - ./modules/core/testMatrixPseudoInverse
-  - ctest
+  - ctest -VV
 
 notifications:
   email:
