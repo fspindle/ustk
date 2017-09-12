@@ -39,8 +39,11 @@ before_install:
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq libswscale-dev libavutil-dev; fi"
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq libavformat-dev; fi"
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq libavcodec-dev libbz2-dev; fi"
+  - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq locate ; fi"
 
 before_script:
+  - sudo updatedb 
+  - locate libomp.so
   - git clone https://github.com/lagadic/visp.git /tmp/visp
   - mkdir build
   - cd build

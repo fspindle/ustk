@@ -18,6 +18,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/ustk_core/cmake")
 VP_OPTION(USE_FFTW "FFTW" "" "Include fftw support" "" ON)
 VP_OPTION(USE_VTK  "VTK"  QUIET "Include vtk support"  "" ON)
 
+message("------------------ OpenMP_CXX_LIBRARIES: ${OpenMP_CXX_LIBRARIES}")
+
 if(USE_VTK)
   if(NOT VTK_VERSION)
     set(VTK_VERSION "${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}")
