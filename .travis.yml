@@ -51,9 +51,8 @@ before_script:
 script: 
   - make
   - pwd
-  - ls -la
-  - ls modules/core/Release
-  - ./modules/core/Release/testMatrixPseudoInverse
+  - ls modules/core
+  - ./modules/core/testMatrixPseudoInverse
   - ctest
 
 notifications:
