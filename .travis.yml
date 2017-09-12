@@ -40,6 +40,7 @@ before_install:
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq libavformat-dev; fi"
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq libavcodec-dev libbz2-dev; fi"
   - "if [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq locate ; fi"
+  - "if [ $CC = 'clang' ]; then export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/clang-3.9.0/lib; fi"
 
 before_script:
   - sudo updatedb 
